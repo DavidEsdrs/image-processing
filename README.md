@@ -6,20 +6,20 @@ This project is intended to offer a set of basic features on image processing. A
 
 Note that by now the effects are applied to the images on the image folder (in the final project it is inteded to be a tool)
 
-[X] Flip X
-[X] Flip Y
-[-] Rotate 
-  [ ] 90 degrees
-  [ ] 180 degrees
-  [X] 270 degrees (kind of...)
-[X] Grayscale
-[-] Resize
-  [X] Nearest neighbor (low quality)
-  [ ] Bilinear interpolation
-  [ ] Bicubic interpolation
-[ ] Blur
-[ ] Sharpen
-[ ] Other...
+- [X] Flip X
+- [X] Flip Y
+- [-] Rotate 
+  - [ ] 90 degrees
+  - [ ] 180 degrees
+  - [X] 270 degrees (kind of...)
+- [X] Grayscale
+- [-] Resize
+  - [X] Nearest neighbor (low quality)
+  - [ ] Bilinear interpolation
+  - [ ] Bicubic interpolation
+- [ ] Blur
+- [ ] Sharpen
+- [ ] Other...
 
 ## Requirements 🔎
 
