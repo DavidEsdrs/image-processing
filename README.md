@@ -2,7 +2,7 @@
 
 This project is intended to offer a set of basic features on image processing. At this moment, it just take all the images on the images folder and perform the effects needed
 
-## Features
+## Features 🌟
 
 Note that by now the effects are applied to the images on the image folder (in the final project it is inteded to be a tool)
 
@@ -21,11 +21,11 @@ Note that by now the effects are applied to the images on the image folder (in t
 [ ] Sharpen
 [ ] Other...
 
-## Requirements
+## Requirements 🔎
 
 It was developed on golang 1.20.4, but it is likely to work on golang 1.16+
 
-## How to use
+## How to use :books:
 
 After cloning this repository in your machine. You can perform one or more operations (listed above) onto the images. To perform the operation, you need to run the main package with one or more arguments, separeted by space.
 
@@ -76,13 +76,13 @@ go run main.go -nn .5
 go run main.go -bw
 ```
 
-**More will be added soon**
+> **More will be added soon** 😄
 
-## Considerations
+## Considerations ⚠️
 
 As the project progresses, it will get closer to being a tool (like a small version of ffmpeg, just for images) and more effects.
 
-## Examples
+## Examples ⭐
 
 Apply grayscale filter, flip in Y axis and resize it to half its size
 
