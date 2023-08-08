@@ -73,7 +73,7 @@ go run main.go -nn .5
 - Grayscale:
 
 ```sh
-go run main.go -bw
+go run main.go -gs
 ```
 
 > **More will be added soon** 😄
