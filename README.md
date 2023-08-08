@@ -4,8 +4,6 @@ This project is intended to offer a set of basic features on image processing. A
 
 ## Features 🌟
 
-Note that by now the effects are applied to the images on the image folder (in the final project it is inteded to be a tool)
-
 - [X] Flip X
 - [X] Flip Y
 - [-] Rotate 
