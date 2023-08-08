@@ -1,6 +1,7 @@
 package main
 
 import (
+	"flag"
 	"fmt"
 	"image"
 	"image/color"
@@ -10,7 +11,6 @@ import (
 	"log"
 	"os"
 	"path/filepath"
-	"strconv"
 	"time"
 
 	"github.com/DavidEsdrs/image-processing/processor"
@@ -19,6 +19,16 @@ import (
 type ProcessResult struct {
 	fileName string
 	success  bool
+}
+
+type Config struct {
+	Input           string
+	Output          string
+	FlipY           bool
+	FlipX           bool
+	Transpose       bool
+	Grayscale       bool
+	NearestNeighbor float64
 }
 
 // Convert the image into a tensor to further manipulation
@@ -57,35 +67,23 @@ func convertIntoImage(pixels [][]color.Color) image.Image {
 	return nImg
 }
 
-func parseArgs(args []string) processor.Processor {
+func parseConfig(config Config) processor.Processor {
 	proc := processor.ImageProcessor{}
 
-	for index, arg := range args {
-		if arg == "-tl" {
-			proc.TurnLeft()
-		}
-		if arg == "-tr" {
-			proc.TurnRight()
-		}
-		if arg == "-t" {
-			proc.Transpose()
-		}
-		if arg == "-fy" {
-			proc.FlipY()
-		}
-		if arg == "-fx" {
-			proc.FlipX()
-		}
-		if arg == "-nn" {
-			factor, err := strconv.ParseFloat(args[index+1], 32)
-			if err != nil {
-				panic("Can't parse factor")
-			}
-			proc.NearestNeighbor(float32(factor))
-		}
-		if arg == "-bw" {
-			proc.BlackAndWhite()
-		}
+	if config.Transpose {
+		proc.Transpose()
+	}
+	if config.FlipY {
+		proc.FlipY()
+	}
+	if config.FlipX {
+		proc.FlipX()
+	}
+	if config.NearestNeighbor != 1.0 {
+		proc.NearestNeighbor(float32(config.NearestNeighbor))
+	}
+	if config.Grayscale {
+		proc.BlackAndWhite()
 	}
 
 	return &proc
@@ -110,15 +108,20 @@ func processImage(img image.Image, file string, outputFolder string, proc proces
 }
 
 func main() {
-	args := os.Args[1:]
+	var config Config
+
+	flag.StringVar(&config.Input, "-i", "", "Input file")
+	flag.StringVar(&config.Output, "-o", "", "Output file")
+	flag.BoolVar(&config.FlipY, "-fy", false, "Flip y axis filter")
+	flag.BoolVar(&config.FlipX, "-fx", false, "Flip x axis filter")
+	flag.BoolVar(&config.Transpose, "-t", false, "Apply transpose process (rotate 270 degrees and flip Y axis)")
+	flag.Float64Var(&config.NearestNeighbor, "-nn", 1.0, "Apply nearest neighbor resize algorithm")
 
 	results := make([]ProcessResult, 1)
 
 	start := time.Now()
 
-	processor := parseArgs(args)
-
-	file := args[1]
+	file := config.Input
 
 	img, err := loadImage(file)
 
@@ -127,8 +130,10 @@ func main() {
 		log.Fatalf("error - %v\n", err.Error())
 	}
 
+	proc := parseConfig(config)
+
 	// main process
-	processImage(img, file, "assets", processor)
+	processImage(img, file, "assets", proc)
 
 	fmt.Printf("process: image %v processed\n", file)
 
