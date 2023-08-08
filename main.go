@@ -110,12 +110,12 @@ func processImage(img image.Image, file string, outputFolder string, proc proces
 func main() {
 	var config Config
 
-	flag.StringVar(&config.Input, "-i", "", "Input file")
-	flag.StringVar(&config.Output, "-o", "", "Output file")
-	flag.BoolVar(&config.FlipY, "-fy", false, "Flip y axis filter")
-	flag.BoolVar(&config.FlipX, "-fx", false, "Flip x axis filter")
-	flag.BoolVar(&config.Transpose, "-t", false, "Apply transpose process (rotate 270 degrees and flip Y axis)")
-	flag.Float64Var(&config.NearestNeighbor, "-nn", 1.0, "Apply nearest neighbor resize algorithm")
+	flag.StringVar(&config.Input, "i", "", "Input file")
+	flag.StringVar(&config.Output, "o", "", "Output file")
+	flag.BoolVar(&config.FlipY, "fy", false, "Flip y axis filter")
+	flag.BoolVar(&config.FlipX, "fx", false, "Flip x axis filter")
+	flag.BoolVar(&config.Transpose, "t", false, "Apply transpose process (rotate 270 degrees and flip Y axis)")
+	flag.Float64Var(&config.NearestNeighbor, "nn", 1.0, "Apply nearest neighbor resize algorithm")
 
 	results := make([]ProcessResult, 1)
 
