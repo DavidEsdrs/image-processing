@@ -141,7 +141,7 @@ func main() {
 					fmt.Printf("error - %v\n", err.Error())
 					return
 				}
-				processImage(img, file, "results", processor)
+				processImage(img, file, "assets", processor)
 				fmt.Printf("process: image %v processed\n", file)
 			}(file.Name(), index)
 		}
@@ -166,12 +166,3 @@ func loadImage(file string) (image.Image, error) {
 	}
 	return img, nil
 }
-
-/*
-[
-	[img[int(y-y1), int(x-x1), c], img[int(y-y2), int(x-x1), c], img[int(y+y3), int(x-x1), c], img[int(y+y4), int(x-x1), c] ],
-	[img[int(y-y1), int(x-x2), c], img[int(y-y2), int(x-x2), c], img[int(y+y3), int(x-x2), c], img[int(y+y4), int(x-x2), c] ],
-	[img[int(y-y1), int(x+x3), c], img[int(y-y2), int(x+x3), c], img[int(y+y3), int(x+x3), c], img[int(y+y4), int(x+x3), c] ],
-	[img[int(y-y1), int(x+x4), c], img[int(y-y2), int(x+x4), c], img[int(y+y3), int(x+x4), c], img[int(y+y4), int(x+x4), c] ]
-]
-*/
