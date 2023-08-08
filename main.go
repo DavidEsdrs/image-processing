@@ -11,7 +11,6 @@ import (
 	"os"
 	"path/filepath"
 	"strconv"
-	"sync"
 	"time"
 
 	"github.com/DavidEsdrs/image-processing/processor"
@@ -111,47 +110,31 @@ func processImage(img image.Image, file string, outputFolder string, proc proces
 }
 
 func main() {
-	files, err := os.ReadDir(filepath.Join(".", "images"))
-
-	if err != nil {
-		log.Fatal("Error in the input folder")
-	}
-
-	fmt.Printf("%v, %v\n", files, len(files))
-
-	var wg sync.WaitGroup
-
 	args := os.Args[1:]
 
-	results := make([]ProcessResult, len(files))
+	results := make([]ProcessResult, 1)
 
 	start := time.Now()
 
 	processor := parseArgs(args)
 
-	for index, file := range files {
-		if !file.IsDir() {
-			wg.Add(1)
+	file := args[1]
 
-			go func(file string, index int) {
-				defer wg.Done()
-				img, err := loadImage(filepath.Join(".", "images", file))
-				if err != nil {
-					results[index] = ProcessResult{fileName: file, success: false}
-					fmt.Printf("error - %v\n", err.Error())
-					return
-				}
-				processImage(img, file, "assets", processor)
-				fmt.Printf("process: image %v processed\n", file)
-			}(file.Name(), index)
-		}
+	img, err := loadImage(file)
+
+	if err != nil {
+		results[0] = ProcessResult{fileName: file, success: false}
+		log.Fatalf("error - %v\n", err.Error())
 	}
 
-	wg.Wait()
+	// main process
+	processImage(img, file, "assets", processor)
+
+	fmt.Printf("process: image %v processed\n", file)
 
 	duration := time.Since(start)
 
-	fmt.Printf("completed: %v images processed - %v milliseconds\n", len(files), duration.Milliseconds())
+	fmt.Printf("completed: %v image processed - %v milliseconds\n", 1, duration.Milliseconds())
 }
 
 func loadImage(file string) (image.Image, error) {
