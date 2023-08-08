@@ -92,13 +92,17 @@ go run main.go -bw -fy -nn .5
 ```
 
 before:
+
 ![sample image before effects](./images/SamSpratt_KidCudi_ManOnTheMoon3_AlbumCover_Web.jpg)
 
 after:
+
 ![sample image after effects](./assets/SamSpratt_KidCudi_ManOnTheMoon3_AlbumCover_Web.jpg)
 
 before:
+
 ![lunch before effects](./images/almoço.png)
 
 after:
+
 ![lunch after effects](./assets/almoço.png)
