@@ -10,7 +10,6 @@ import (
 	_ "image/png"
 	"log"
 	"os"
-	"path/filepath"
 	"time"
 
 	"github.com/DavidEsdrs/image-processing/processor"
@@ -103,8 +102,12 @@ func processImage(img image.Image, file string, outputFolder string, proc proces
 	tensor := convertIntoTensor(img)
 	iep := proc.Execute(&tensor)
 	cImg := convertIntoImage(iep)
-	outputPath := filepath.Join(outputFolder, file)
-	saveImage(cImg, outputPath)
+	outputPath := outputFolder
+	println(outputFolder)
+	err := saveImage(cImg, outputPath)
+	if err != nil {
+		log.Fatal(err.Error())
+	}
 }
 
 func main() {
@@ -116,6 +119,13 @@ func main() {
 	flag.BoolVar(&config.FlipX, "fx", false, "Flip x axis filter")
 	flag.BoolVar(&config.Transpose, "t", false, "Apply transpose process (rotate 270 degrees and flip Y axis)")
 	flag.Float64Var(&config.NearestNeighbor, "nn", 1.0, "Apply nearest neighbor resize algorithm")
+
+	flag.Parse()
+
+	if config.Input == "" || config.Output == "" {
+		flag.Usage()
+		log.Fatal("Input and output files are required.")
+	}
 
 	results := make([]ProcessResult, 1)
 
@@ -132,8 +142,10 @@ func main() {
 
 	proc := parseConfig(config)
 
+	output := config.Output
+
 	// main process
-	processImage(img, file, "assets", proc)
+	processImage(img, file, output, proc)
 
 	fmt.Printf("process: image %v processed\n", file)
 
