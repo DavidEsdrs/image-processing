@@ -118,6 +118,7 @@ func main() {
 	flag.BoolVar(&config.FlipY, "fy", false, "Flip y axis filter")
 	flag.BoolVar(&config.FlipX, "fx", false, "Flip x axis filter")
 	flag.BoolVar(&config.Transpose, "t", false, "Apply transpose process (rotate 270 degrees and flip Y axis)")
+	flag.BoolVar(&config.Grayscale, "gs", false, "Apply grayscale filter")
 	flag.Float64Var(&config.NearestNeighbor, "nn", 1.0, "Apply nearest neighbor resize algorithm")
 
 	flag.Parse()
