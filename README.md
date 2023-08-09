@@ -87,7 +87,7 @@ Apply grayscale filter, flip in Y axis and resize it to half its size
 
 input:
 ```sh
-go run main.go -i ./images/almoço.png -o ./assets/almoço.png -bw -fy -nn .5
+go run main.go -i ./images/almoço.png -o ./assets/almoço.png -gs -fy -nn .5
 ```
 
 before:
