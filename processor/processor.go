@@ -16,7 +16,6 @@ type Processor interface {
 	Transpose()
 	BlackAndWhite()
 	NearestNeighbor(factor float32)
-	SetSource(*[][]color.Color)
 	Execute(*[][]color.Color) [][]color.Color
 }
 
@@ -26,10 +25,6 @@ type ImageProcessor struct {
 	// Note that the source matrix has the axis x and y inverted in relation to the source image (it has to be taken in consideration when performing the algorithms)
 	source    *[][]color.Color
 	processes []Process
-}
-
-func (ip *ImageProcessor) SetSource(img *[][]color.Color) {
-	ip.source = img
 }
 
 func flipX(pImg *[][]color.Color) {
