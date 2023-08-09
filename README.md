@@ -60,7 +60,7 @@ go run main.go -i [input] -o [output] -t
 go run main.go -i [input] -o [output] -nn [factor]
 ```
 
-**Note**: The factor of resize must be > 0. Note that the algorithm applied is the `nearest neighbor`, which is knowm to give pixelated results
+**Note**: The factor of resize must be > 0. Note that the algorithm applied is the `nearest neighbor`, which is known to give pixelated results
 
 Examplo:
 
