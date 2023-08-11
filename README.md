@@ -32,14 +32,11 @@ For the build version you just need to install the [executable](https://github.c
 
 ## How to use :books:
 
-After installing the build in your machine. You can perform one or more operations (listed below) onto the images. To perform the operation, you need to run the main package with one or more arguments, separated by space.
-The arguments -i (input) and -o (output) are mandatory
+After installing the build in your machine. You can perform one or more operations (listed below) onto the images. The arguments -i (input) and -o (output) are mandatory. You can perform one or more operations.
 
 ```sh
 iproc -i [input] -o [output] [...args]
 ```
-
-> **note**: The effect is applied for all the images in the image folder
 
 Each argument perform a given effect:
 
