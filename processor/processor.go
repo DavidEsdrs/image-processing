@@ -142,37 +142,17 @@ func nearestNeighbor(pImg *[][]color.Color, factor float32) {
 		return
 	}
 
-	var proportion int
-	var rows int
-	var cols int
-
-	if factor <= 1 {
-		proportion = int(1 / factor)
-		rows = int(len(img) / proportion)
-		cols = int(len(img[0]) / proportion)
-	} else {
-		proportion = int(1 * factor)
-		rows = int(len(img) * proportion)
-		cols = int(len(img[0]) * proportion)
-	}
+	proportion := int(1 / factor)
+	rows := int(len(img) / proportion)
+	cols := int(len(img[0]) / proportion)
 
 	res := make([][]color.Color, rows)
 
-	if factor <= 1 {
-		for i := 0; i < rows; i++ {
-			res[i] = make([]color.Color, cols)
+	for i := 0; i < rows; i++ {
+		res[i] = make([]color.Color, cols)
 
-			for j := 0; j < cols; j++ {
-				res[i][j] = img[i*proportion][j*proportion]
-			}
-		}
-	} else {
-		for i := 0; i < rows; i++ {
-			res[i] = make([]color.Color, cols)
-
-			for j := 0; j < cols; j++ {
-				res[i][j] = img[i/proportion][j/proportion]
-			}
+		for j := 0; j < cols; j++ {
+			res[i][j] = img[i*proportion][j*proportion]
 		}
 	}
 
