@@ -112,7 +112,6 @@ func processImage(img image.Image, file string, outputFolder string, proc proces
 	iep := proc.Execute(&tensor)
 	cImg := convertIntoImage(iep)
 	outputPath := outputFolder
-	println(outputFolder)
 	err := saveImage(cImg, outputPath)
 	if err != nil {
 		log.Fatal(err.Error())
