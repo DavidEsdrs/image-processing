@@ -27,6 +27,8 @@ type Config struct {
 	FlipX           bool
 	Transpose       bool
 	Grayscale       bool
+	TurnLeft        bool
+	TurnRight       bool
 	NearestNeighbor float64
 }
 
@@ -78,6 +80,12 @@ func parseConfig(config Config) processor.Processor {
 	if config.Grayscale {
 		proc.BlackAndWhite()
 	}
+	if config.TurnLeft {
+		proc.TurnLeft()
+	}
+	if config.TurnRight {
+		proc.TurnRight()
+	}
 
 	return &proc
 }
@@ -112,6 +120,8 @@ func main() {
 	flag.BoolVar(&config.FlipY, "fy", false, "Flip y axis filter")
 	flag.BoolVar(&config.FlipX, "fx", false, "Flip x axis filter")
 	flag.BoolVar(&config.Transpose, "t", false, "Apply transpose process (rotate 270 degrees and flip Y axis)")
+	flag.BoolVar(&config.TurnLeft, "tl", false, "Rotate 90 degrees counterclockwise")
+	flag.BoolVar(&config.TurnRight, "tr", false, "Rotate 90 degrees clockwise")
 	flag.BoolVar(&config.Grayscale, "gs", false, "Apply grayscale filter")
 	flag.Float64Var(&config.NearestNeighbor, "nn", 1.0, "Apply nearest neighbor resize algorithm")
 

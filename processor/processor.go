@@ -3,7 +3,6 @@ package processor
 import (
 	"fmt"
 	"image/color"
-	"log"
 
 	"github.com/DavidEsdrs/image-processing/utils"
 )
@@ -16,7 +15,6 @@ type Processor interface {
 	Transpose()
 	BlackAndWhite()
 	NearestNeighbor(factor float32)
-	// Note that the source matrix has the axis x and y inverted in relation to the source image (it has to be taken in consideration when performing the algorithms)
 	Execute(source *[][]color.Color) [][]color.Color
 }
 
@@ -86,8 +84,32 @@ func (ip *ImageProcessor) TurnLeft() {
 	ip.processes = append(ip.processes, turnLeft)
 }
 
+func turnRight(pImg *[][]color.Color) {
+	img := *pImg
+
+	originalRows := len(img)
+	originalCols := len(img[0])
+
+	rows := len(img[0])
+	cols := len(img)
+
+	res := make([][]color.Color, rows)
+
+	for i := range res {
+		res[i] = make([]color.Color, cols)
+	}
+
+	for i := 0; i < originalRows; i++ {
+		for j := 0; j < originalCols; j++ {
+			res[j][originalRows-i-1] = img[i][j]
+		}
+	}
+
+	*pImg = res
+}
+
 func (ip *ImageProcessor) TurnRight() {
-	log.Fatal("Turn right not implemented")
+	ip.processes = append(ip.processes, turnRight)
 }
 
 func transpose(pImg *[][]color.Color) {
