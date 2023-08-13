@@ -61,10 +61,22 @@ func parseConfig(config Config) processor.Processor {
 	}
 	if config.Crop != "" {
 		str := strings.Split(config.Crop, ",")
-		xstart, _ := strconv.Atoi(str[0])
-		xend, _ := strconv.Atoi(str[1])
-		ystart, _ := strconv.Atoi(str[2])
-		yend, _ := strconv.Atoi(str[3])
+
+		var xstart int
+		var xend int
+		var ystart int
+		var yend int
+
+		if len(str) == 4 {
+			xstart, _ = strconv.Atoi(str[0])
+			xend, _ = strconv.Atoi(str[1])
+			ystart, _ = strconv.Atoi(str[2])
+			yend, _ = strconv.Atoi(str[3])
+		} else {
+			xend, _ = strconv.Atoi(str[0])
+			yend, _ = strconv.Atoi(str[1])
+		}
+
 		proc.Crop(xstart, xend, ystart, yend)
 	}
 
@@ -108,7 +120,7 @@ func main() {
 	flag.BoolVar(&config.TurnRight, "tr", false, "Rotate 90 degrees clockwise")
 	flag.BoolVar(&config.Grayscale, "gs", false, "Apply grayscale filter")
 	flag.Float64Var(&config.NearestNeighbor, "nn", 1.0, "Apply nearest neighbor resize algorithm")
-	flag.StringVar(&config.Crop, "c", "", "Crop image at given coordinates. Ex.: \"-c 0,1000,0,200\", xstart,xend,ystart,yend")
+	flag.StringVar(&config.Crop, "c", "", "Crop image at given coordinates. Ex.: \"-c 0,1000,0,200\", xstart,xend,ystart,yend or \"-c 1000,200\", xend,yend (x and y start default to 0)")
 
 	flag.Parse()
 
