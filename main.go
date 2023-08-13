@@ -4,11 +4,13 @@ import (
 	"flag"
 	"fmt"
 	"image"
-	"image/jpeg"
 	_ "image/jpeg"
+	"image/png"
 	_ "image/png"
 	"log"
 	"os"
+	"strconv"
+	"strings"
 	"time"
 
 	"github.com/DavidEsdrs/image-processing/convert"
@@ -30,6 +32,7 @@ type Config struct {
 	TurnLeft        bool
 	TurnRight       bool
 	NearestNeighbor float64
+	Crop            string
 }
 
 func parseConfig(config Config) processor.Processor {
@@ -56,6 +59,14 @@ func parseConfig(config Config) processor.Processor {
 	if config.TurnRight {
 		proc.TurnRight()
 	}
+	if config.Crop != "" {
+		str := strings.Split(config.Crop, ",")
+		xstart, _ := strconv.Atoi(str[0])
+		xend, _ := strconv.Atoi(str[1])
+		ystart, _ := strconv.Atoi(str[2])
+		yend, _ := strconv.Atoi(str[3])
+		proc.Crop(xstart, xend, ystart, yend)
+	}
 
 	return &proc
 }
@@ -66,7 +77,7 @@ func saveImage(img image.Image, outputPath string) error {
 		return err
 	}
 	defer fg.Close()
-	err = jpeg.Encode(fg, img, nil)
+	err = png.Encode(fg, img)
 	return err
 }
 
@@ -93,6 +104,7 @@ func main() {
 	flag.BoolVar(&config.TurnRight, "tr", false, "Rotate 90 degrees clockwise")
 	flag.BoolVar(&config.Grayscale, "gs", false, "Apply grayscale filter")
 	flag.Float64Var(&config.NearestNeighbor, "nn", 1.0, "Apply nearest neighbor resize algorithm")
+	flag.StringVar(&config.Crop, "c", "", "Crop image at given coordinates. Ex.: \"-c 0,1000,0,200\", xstart,xend,ystart,yend")
 
 	flag.Parse()
 

@@ -8,6 +8,7 @@ import (
 )
 
 type Processor interface {
+	Crop(xstart, xend, ystart, yend int)
 	FlipX()
 	FlipY()
 	TurnLeft()
@@ -22,6 +23,31 @@ type Process func(*[][]color.Color)
 
 type ImageProcessor struct {
 	processes []Process
+}
+
+func crop(pImg *[][]color.Color, xstart, xend, ystart, yend int) {
+	img := *pImg
+
+	res := make([][]color.Color, yend-ystart)
+
+	for i := range res {
+		res[i] = make([]color.Color, xend-xstart)
+	}
+
+	for i := ystart; i < yend; i++ {
+		for j := xstart; j < xend; j++ {
+			res[i-ystart][j-xstart] = img[i][j]
+		}
+	}
+
+	*pImg = res
+}
+
+func (ip *ImageProcessor) Crop(xstart, xend, ystart, yend int) {
+	p := func(pImg *[][]color.Color) {
+		crop(pImg, xstart, xend, ystart, yend)
+	}
+	ip.processes = append(ip.processes, p)
 }
 
 func flipY(pImg *[][]color.Color) {
