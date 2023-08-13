@@ -5,6 +5,22 @@ import (
 	"image/color"
 )
 
+type ConversionStrategy interface {
+	convert(pixels [][]color.Color) image.Image
+}
+
+type ConversionContext struct {
+	strategy ConversionStrategy
+}
+
+func (cc *ConversionContext) SetStrategy(cs ConversionStrategy) {
+	cc.strategy = cs
+}
+
+func (cc *ConversionContext) ExecuteConversion(pixels [][]color.Color) image.Image {
+	return cc.strategy.convert(pixels)
+}
+
 // Convert the image into a tensor to further manipulation
 func ConvertIntoTensor(img image.Image) [][]color.Color {
 	size := img.Bounds().Size()
@@ -18,27 +34,4 @@ func ConvertIntoTensor(img image.Image) [][]color.Color {
 	}
 
 	return pixels
-}
-
-// Convert tensor back to image
-func ConvertIntoImage(pixels [][]color.Color) image.Image {
-	rect := image.Rect(0, 0, len(pixels[0]), len(pixels))
-	nImg := image.NewRGBA(rect)
-	for y := 0; y < len(pixels); y++ {
-		for x := 0; x < len(pixels[0]); x++ {
-			q := pixels[y]
-			if q == nil {
-				continue
-			}
-			p := pixels[y][x]
-			if p == nil {
-				continue
-			}
-			original, ok := color.RGBAModel.Convert(p).(color.RGBA)
-			if ok {
-				nImg.Set(x, y, original)
-			}
-		}
-	}
-	return nImg
 }

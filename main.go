@@ -84,7 +84,21 @@ func saveImage(img image.Image, outputPath string) error {
 func processImage(img image.Image, file string, outputFolder string, proc processor.Processor) {
 	tensor := convert.ConvertIntoTensor(img)
 	iep := proc.Execute(&tensor)
-	cImg := convert.ConvertIntoImage(iep)
+	context := convert.ConversionContext{}
+
+	strs := strings.Split(file, ".")
+	ftype := strs[len(strs)-1]
+
+	switch ftype {
+	case "png":
+		context.SetStrategy(&convert.PngStrategy{})
+	case "jpeg":
+	case "jpg":
+		context.SetStrategy(&convert.JpgStrategy{})
+	}
+
+	cImg := context.ExecuteConversion(iep)
+
 	outputPath := outputFolder
 	err := saveImage(cImg, outputPath)
 	if err != nil {
