@@ -10,12 +10,10 @@ type ConversionStrategy interface {
 	Save(img image.Image, output string) error
 }
 
-type ParsingContext struct {
-	strategy ConversionStrategy
-}
+type ParsingContext struct{}
 
 func NewParsingContext() *ParsingContext {
-	return &ParsingContext{nil}
+	return &ParsingContext{}
 }
 
 func (cc *ParsingContext) GetConfig(file string) (ConversionStrategy, error) {
