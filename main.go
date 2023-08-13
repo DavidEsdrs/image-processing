@@ -74,20 +74,16 @@ func parseConfig(config Config) processor.Processor {
 func processImage(img image.Image, file string, outputPath string, proc processor.Processor) {
 	tensor := convert.ConvertIntoTensor(img)
 	iep := proc.Execute(&tensor)
-	context := convert.ConversionContext{}
 
-	strs := strings.Split(file, ".")
-	ftype := strs[len(strs)-1]
+	context := convert.NewConversionContext()
 
-	switch ftype {
-	case "png":
-		context.SetStrategy(&convert.PngStrategy{})
-	case "jpeg":
-	case "jpg":
-		context.SetStrategy(&convert.JpgStrategy{})
+	conversor, err := context.GetConversor(file)
+
+	if err != nil {
+		log.Fatal(err.Error())
 	}
 
-	cImg := context.ExecuteConversion(iep)
+	cImg := conversor.Convert(iep)
 
 	pc := parsing.NewParsingContext()
 
