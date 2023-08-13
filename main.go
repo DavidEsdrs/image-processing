@@ -5,7 +5,6 @@ import (
 	"fmt"
 	"image"
 	_ "image/jpeg"
-	"image/png"
 	_ "image/png"
 	"log"
 	"os"
@@ -14,6 +13,7 @@ import (
 	"time"
 
 	"github.com/DavidEsdrs/image-processing/convert"
+	"github.com/DavidEsdrs/image-processing/parsing"
 	"github.com/DavidEsdrs/image-processing/processor"
 )
 
@@ -71,17 +71,7 @@ func parseConfig(config Config) processor.Processor {
 	return &proc
 }
 
-func saveImage(img image.Image, outputPath string) error {
-	fg, err := os.Create(outputPath)
-	if err != nil {
-		return err
-	}
-	defer fg.Close()
-	err = png.Encode(fg, img)
-	return err
-}
-
-func processImage(img image.Image, file string, outputFolder string, proc processor.Processor) {
+func processImage(img image.Image, file string, outputPath string, proc processor.Processor) {
 	tensor := convert.ConvertIntoTensor(img)
 	iep := proc.Execute(&tensor)
 	context := convert.ConversionContext{}
@@ -99,11 +89,15 @@ func processImage(img image.Image, file string, outputFolder string, proc proces
 
 	cImg := context.ExecuteConversion(iep)
 
-	outputPath := outputFolder
-	err := saveImage(cImg, outputPath)
+	pc := parsing.NewParsingContext()
+
+	config, err := pc.GetConfig(file)
+
 	if err != nil {
 		log.Fatal(err.Error())
 	}
+
+	config.Save(cImg, outputPath)
 }
 
 func main() {
