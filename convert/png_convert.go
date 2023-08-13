@@ -10,7 +10,7 @@ type PngStrategy struct{}
 
 // let's assume that png images are 48 bits depth
 // Change it!!!
-func (pstr *PngStrategy) convert(pixels [][]color.Color) image.Image {
+func (pstr *PngStrategy) Convert(pixels [][]color.Color) image.Image {
 	rect := image.Rect(0, 0, len(pixels[0]), len(pixels))
 	nImg := image.NewNRGBA(rect)
 	for y := 0; y < len(pixels); y++ {

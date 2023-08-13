@@ -10,7 +10,7 @@ type JpgStrategy struct{}
 
 // let's assume that jpg images are 24 bits depth
 // Change it!!!
-func (pstr *JpgStrategy) convert(pixels [][]color.Color) image.Image {
+func (pstr *JpgStrategy) Convert(pixels [][]color.Color) image.Image {
 	rect := image.Rect(0, 0, len(pixels[0]), len(pixels))
 	nImg := image.NewRGBA(rect)
 	for y := 0; y < len(pixels); y++ {

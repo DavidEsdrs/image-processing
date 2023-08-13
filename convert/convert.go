@@ -1,24 +1,35 @@
 package convert
 
 import (
+	"fmt"
 	"image"
 	"image/color"
+	"strings"
 )
 
 type ConversionStrategy interface {
-	convert(pixels [][]color.Color) image.Image
+	Convert(pixels [][]color.Color) image.Image
 }
 
-type ConversionContext struct {
-	strategy ConversionStrategy
+type ConversionContext struct{}
+
+func NewConversionContext() *ConversionContext {
+	return &ConversionContext{}
 }
 
-func (cc *ConversionContext) SetStrategy(cs ConversionStrategy) {
-	cc.strategy = cs
-}
+func (cc *ConversionContext) GetConversor(file string) (ConversionStrategy, error) {
+	strs := strings.Split(file, ".")
+	ftype := strs[len(strs)-1]
 
-func (cc *ConversionContext) ExecuteConversion(pixels [][]color.Color) image.Image {
-	return cc.strategy.convert(pixels)
+	switch ftype {
+	case "png":
+		return &PngStrategy{}, nil
+	case "jpeg":
+	case "jpg":
+		return &JpgStrategy{}, nil
+	}
+
+	return nil, fmt.Errorf("unknown file type")
 }
 
 // Convert the image into a tensor to further manipulation
