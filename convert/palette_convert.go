@@ -12,21 +12,25 @@ type PaletteStrategy struct {
 }
 
 func (pstr *PaletteStrategy) Convert(pixels [][]color.Color) image.Image {
-	rect := image.Rect(0, 0, len(pixels[0]), len(pixels))
+	rows := len(pixels)
+	cols := len(pixels[0])
+	rect := image.Rect(0, 0, cols, rows)
 	nImg := image.NewPaletted(rect, pstr.palette)
-	for y := 0; y < len(pixels); y++ {
-		for x := 0; x < len(pixels[0]); x++ {
-			q := pixels[y]
-			if q == nil {
-				continue
-			}
+
+	conversions := make(map[color.Color]color.Color, len(pstr.palette))
+
+	for y := 0; y < rows; y++ {
+		for x := 0; x < cols; x++ {
 			p := pixels[y][x]
-			if p == nil {
-				continue
+			c, ok := conversions[p]
+			if !ok {
+				// Adicionar uma conversão prévia se não existir
+				c = pstr.palette.Convert(p)
+				conversions[p] = c
 			}
-			clr := pstr.palette.Convert(p)
-			nImg.Set(x, y, clr)
+			nImg.Set(x, y, c)
 		}
 	}
+
 	return nImg
 }
