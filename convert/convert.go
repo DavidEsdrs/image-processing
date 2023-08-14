@@ -4,6 +4,8 @@ import (
 	"fmt"
 	"image"
 	"image/color"
+
+	"github.com/DavidEsdrs/image-processing/configs"
 )
 
 type ConversionStrategy interface {
@@ -16,8 +18,13 @@ func NewConversionContext() *ConversionContext {
 	return &ConversionContext{}
 }
 
-func (cc *ConversionContext) GetConversor(img image.Image) (ConversionStrategy, error) {
-	model := img.ColorModel()
+func (cc *ConversionContext) GetConversor(img image.Image, mdl color.Model) (ConversionStrategy, error) {
+	var model color.Model
+	if mdl == nil {
+		model = img.ColorModel()
+	} else {
+		model = mdl
+	}
 	switch model {
 	case color.Alpha16Model:
 		return &Alpha16Strategy{}, nil
@@ -38,7 +45,20 @@ func (cc *ConversionContext) GetConversor(img image.Image) (ConversionStrategy, 
 	case color.RGBAModel:
 		return &RgbaStrategy{}, nil
 	case color.YCbCrModel:
-		return &YcbcrStrategy{}, nil
+		cfg := configs.GetConfig()
+
+		// if the user passed a custom subsampling ratio, use it
+		if cfg.Ssr != 0 {
+			return &YcbcrStrategy{cfg.SubsampleRatio}, nil
+		}
+
+		if imgYcbcr, ok := img.(*image.YCbCr); ok {
+			subsamplingRatio := imgYcbcr.SubsampleRatio
+			return &YcbcrStrategy{subsamplingRatio}, nil
+		}
+
+		// Assert
+		return nil, fmt.Errorf("unsupported color model")
 	case color.NYCbCrAModel:
 		return nil, fmt.Errorf("unsupported color model")
 	}
