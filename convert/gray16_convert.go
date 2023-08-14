@@ -4,15 +4,14 @@ import (
 	"image"
 	"image/color"
 	_ "image/jpeg"
+	_ "image/png"
 )
 
-type JpgStrategy struct{}
+type Gray16Strategy struct{}
 
-// let's assume that jpg images are 24 bits depth
-// Change it!!!
-func (pstr *JpgStrategy) Convert(pixels [][]color.Color) image.Image {
+func (pstr *Gray16Strategy) Convert(pixels [][]color.Color) image.Image {
 	rect := image.Rect(0, 0, len(pixels[0]), len(pixels))
-	nImg := image.NewRGBA(rect)
+	nImg := image.NewGray16(rect)
 	for y := 0; y < len(pixels); y++ {
 		for x := 0; x < len(pixels[0]); x++ {
 			q := pixels[y]
@@ -23,7 +22,7 @@ func (pstr *JpgStrategy) Convert(pixels [][]color.Color) image.Image {
 			if p == nil {
 				continue
 			}
-			original, ok := color.RGBAModel.Convert(p).(color.RGBA)
+			original, ok := color.Gray16Model.Convert(p).(color.Gray16)
 			if ok {
 				nImg.Set(x, y, original)
 			}

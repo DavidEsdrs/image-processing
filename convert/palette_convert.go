@@ -3,16 +3,17 @@ package convert
 import (
 	"image"
 	"image/color"
+	_ "image/jpeg"
 	_ "image/png"
 )
 
-type PngStrategy struct{}
+type PaletteStrategy struct {
+	palette color.Palette
+}
 
-// let's assume that png images are 48 bits depth
-// Change it!!!
-func (pstr *PngStrategy) Convert(pixels [][]color.Color) image.Image {
+func (pstr *PaletteStrategy) Convert(pixels [][]color.Color) image.Image {
 	rect := image.Rect(0, 0, len(pixels[0]), len(pixels))
-	nImg := image.NewNRGBA(rect)
+	nImg := image.NewPaletted(rect, pstr.palette)
 	for y := 0; y < len(pixels); y++ {
 		for x := 0; x < len(pixels[0]); x++ {
 			q := pixels[y]
@@ -23,10 +24,8 @@ func (pstr *PngStrategy) Convert(pixels [][]color.Color) image.Image {
 			if p == nil {
 				continue
 			}
-			original, ok := color.NRGBAModel.Convert(p).(color.NRGBA)
-			if ok {
-				nImg.Set(x, y, original)
-			}
+			clr := pstr.palette.Convert(p)
+			nImg.Set(x, y, clr)
 		}
 	}
 	return nImg

@@ -4,7 +4,6 @@ import (
 	"fmt"
 	"image"
 	"image/color"
-	"strings"
 )
 
 type ConversionStrategy interface {
@@ -17,23 +16,36 @@ func NewConversionContext() *ConversionContext {
 	return &ConversionContext{}
 }
 
-func (cc *ConversionContext) GetConversor(file string) (ConversionStrategy, error) {
-	strs := strings.Split(file, ".")
-	ftype := strs[len(strs)-1]
-
-	switch ftype {
-	case "png":
-		return &PngStrategy{}, nil
-	case "jpeg":
-	case "jpg":
-		return &JpgStrategy{}, nil
+func (cc *ConversionContext) GetConversor(model color.Model, img image.Image) (ConversionStrategy, error) {
+	switch model {
+	case color.Alpha16Model:
+		return &Alpha16Strategy{}, nil
+	case color.AlphaModel:
+		return &AlphaStrategy{}, nil
+	case color.CMYKModel:
+		return &CmykStrategy{}, nil
+	case color.Gray16Model:
+		return &Gray16Strategy{}, nil
+	case color.GrayModel:
+		return &GrayStrategy{}, nil
+	case color.NRGBA64Model:
+		return &Nrgba64Strategy{}, nil
+	case color.NRGBAModel:
+		return &NrgbaStrategy{}, nil
+	case color.RGBA64Model:
+		return &Rgba64Strategy{}, nil
+	case color.RGBAModel:
+		return &RgbaStrategy{}, nil
+	case color.YCbCrModel:
+		return &YcbcrStrategy{}, nil
+	case color.NYCbCrAModel:
+		return nil, fmt.Errorf("unsupported color model")
 	}
-
-	return nil, fmt.Errorf("unknown file type")
+	return nil, fmt.Errorf("unsupported color model")
 }
 
 // Convert the image into a tensor to further manipulation
-func ConvertIntoTensor(img image.Image) [][]color.Color {
+func ConvertIntoTensor(img image.Image) ([][]color.Color, color.Model) {
 	size := img.Bounds().Size()
 	pixels := make([][]color.Color, size.Y)
 
@@ -44,5 +56,5 @@ func ConvertIntoTensor(img image.Image) [][]color.Color {
 		}
 	}
 
-	return pixels
+	return pixels, img.ColorModel()
 }
