@@ -65,8 +65,8 @@ func (cc *ConversionContext) GetConversor(img image.Image, mdl color.Model) (Con
 	}
 
 	// TODO: Add flag to ignore unknown color models
-	noIgnoreUnknwon := true
-	if noIgnoreUnknwon {
+	noIgnoreUnknown := true
+	if noIgnoreUnknown {
 		plt, _ := palette.GetPalette(img)
 		return &PaletteStrategy{plt}, nil
 	}
