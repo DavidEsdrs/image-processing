@@ -6,6 +6,7 @@ import (
 	"image/color"
 
 	"github.com/DavidEsdrs/image-processing/configs"
+	"github.com/DavidEsdrs/image-processing/palette"
 )
 
 type ConversionStrategy interface {
@@ -62,6 +63,14 @@ func (cc *ConversionContext) GetConversor(img image.Image, mdl color.Model) (Con
 	case color.NYCbCrAModel:
 		return nil, fmt.Errorf("unsupported color model")
 	}
+
+	// TODO: Add flag to ignore unknown color models
+	noIgnoreUnknwon := true
+	if noIgnoreUnknwon {
+		plt, _ := palette.GetPalette(img)
+		return &PaletteStrategy{plt}, nil
+	}
+
 	return nil, fmt.Errorf("unsupported color model")
 }
 
