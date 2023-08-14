@@ -16,7 +16,8 @@ func NewConversionContext() *ConversionContext {
 	return &ConversionContext{}
 }
 
-func (cc *ConversionContext) GetConversor(model color.Model, img image.Image) (ConversionStrategy, error) {
+func (cc *ConversionContext) GetConversor(img image.Image) (ConversionStrategy, error) {
+	model := img.ColorModel()
 	switch model {
 	case color.Alpha16Model:
 		return &Alpha16Strategy{}, nil
@@ -45,7 +46,7 @@ func (cc *ConversionContext) GetConversor(model color.Model, img image.Image) (C
 }
 
 // Convert the image into a tensor to further manipulation
-func ConvertIntoTensor(img image.Image) ([][]color.Color, color.Model) {
+func ConvertIntoTensor(img image.Image) [][]color.Color {
 	size := img.Bounds().Size()
 	pixels := make([][]color.Color, size.Y)
 
@@ -56,5 +57,5 @@ func ConvertIntoTensor(img image.Image) ([][]color.Color, color.Model) {
 		}
 	}
 
-	return pixels, img.ColorModel()
+	return pixels
 }

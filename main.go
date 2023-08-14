@@ -84,12 +84,12 @@ func parseConfig(config Config) processor.Processor {
 }
 
 func processImage(img image.Image, file string, outputPath string, proc processor.Processor) {
-	tensor, model := convert.ConvertIntoTensor(img)
+	tensor := convert.ConvertIntoTensor(img)
 	iep := proc.Execute(&tensor)
 
 	context := convert.NewConversionContext()
 
-	conversor, err := context.GetConversor(model, img)
+	conversor, err := context.GetConversor(img)
 
 	if err != nil {
 		log.Fatal(err.Error())
