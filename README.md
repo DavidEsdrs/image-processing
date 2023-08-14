@@ -6,11 +6,12 @@ This project is intended to offer a set of basic features on image processing. I
 
 - [X] Flip X
 - [X] Flip Y
-- [-] Rotate 
-  - [ ] 90 degrees
-  - [ ] 180 degrees
-  - [X] 270 degrees (kind of...)
+- [X] Rotate 
+  - [X] Left
+  - [X] Right
+  - [X] Transpose (invert columns and rows)
 - [X] Grayscale
+- [X] Crop
 - [-] Resize
   - [X] Nearest neighbor (low quality)
   - [ ] Bilinear interpolation
@@ -66,12 +67,31 @@ iproc -i [input] -o [output] -nn [factor]
 
 **Note**: The factor of resize must be > 0. Note that the algorithm applied is the `nearest neighbor`, which is known to give pixelated results
 
-Examplo:
+Example:
 
 ```sh
 # half of the actual size
 iproc -i [input] -o [output] -nn .5
 ```
+
+- Crop:
+
+```sh
+iproc -i [input] -o [output] -c [xstart],[xend],[ystart],[yend]
+```
+
+Example:
+```sh
+iproc -i [input] -o [output] -c 0,1000,0,200
+```
+
+The above can be simplified to:
+```sh
+iproc -i [input] -o [output] -c 1000,200
+```
+Representing xend and ysend.
+
+**node**: Default values for xstart and ystart are both 0
 
 - Grayscale:
 
