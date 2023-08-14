@@ -17,18 +17,23 @@ func (pstr *PaletteStrategy) Convert(pixels [][]color.Color) image.Image {
 	rect := image.Rect(0, 0, cols, rows)
 	nImg := image.NewPaletted(rect, pstr.palette)
 
-	conversions := make(map[color.Color]color.Color, len(pstr.palette))
+	indexMap := make(map[color.Color]uint8)
 
 	for y := 0; y < rows; y++ {
 		for x := 0; x < cols; x++ {
-			p := pixels[y][x]
-			c, ok := conversions[p]
+			p := nImg
+
+			i := p.PixOffset(x, y)
+			pixel := pixels[y][x]
+
+			index, ok := indexMap[pixel]
+
 			if !ok {
-				// Adicionar uma conversão prévia se não existir
-				c = pstr.palette.Convert(p)
-				conversions[p] = c
+				index = uint8(pstr.palette.Index(pixel))
+				indexMap[pixel] = index
 			}
-			nImg.Set(x, y, c)
+
+			p.Pix[i] = index
 		}
 	}
 
