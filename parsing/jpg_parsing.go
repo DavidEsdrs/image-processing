@@ -14,6 +14,8 @@ func (jps *JpgParsingStrategy) Save(img image.Image, outputPath string) error {
 		return err
 	}
 	defer fg.Close()
-	err = jpeg.Encode(fg, img, nil)
+	err = jpeg.Encode(fg, img, &jpeg.Options{
+		Quality: 100,
+	})
 	return err
 }
