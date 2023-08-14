@@ -21,9 +21,7 @@ func (pstr *PaletteStrategy) Convert(pixels [][]color.Color) image.Image {
 
 	for y := 0; y < rows; y++ {
 		for x := 0; x < cols; x++ {
-			p := nImg
-
-			i := p.PixOffset(x, y)
+			i := nImg.PixOffset(x, y)
 			pixel := pixels[y][x]
 
 			index, ok := indexMap[pixel]
@@ -33,7 +31,7 @@ func (pstr *PaletteStrategy) Convert(pixels [][]color.Color) image.Image {
 				indexMap[pixel] = index
 			}
 
-			p.Pix[i] = index
+			nImg.Pix[i] = index
 		}
 	}
 
