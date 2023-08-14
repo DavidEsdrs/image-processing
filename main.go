@@ -8,10 +8,9 @@ import (
 	_ "image/png"
 	"log"
 	"os"
-	"strconv"
-	"strings"
 	"time"
 
+	"github.com/DavidEsdrs/image-processing/configs"
 	"github.com/DavidEsdrs/image-processing/convert"
 	"github.com/DavidEsdrs/image-processing/parsing"
 	"github.com/DavidEsdrs/image-processing/processor"
@@ -35,61 +34,14 @@ type Config struct {
 	Crop            string
 }
 
-func parseConfig(config Config) processor.Processor {
-	proc := processor.ImageProcessor{}
-
-	if config.Transpose {
-		proc.Transpose()
-	}
-	if config.FlipY {
-		proc.FlipY()
-	}
-	if config.FlipX {
-		proc.FlipX()
-	}
-	if config.NearestNeighbor != 1.0 {
-		proc.NearestNeighbor(float32(config.NearestNeighbor))
-	}
-	if config.Grayscale {
-		proc.BlackAndWhite()
-	}
-	if config.TurnLeft {
-		proc.TurnLeft()
-	}
-	if config.TurnRight {
-		proc.TurnRight()
-	}
-	if config.Crop != "" {
-		str := strings.Split(config.Crop, ",")
-
-		var xstart int
-		var xend int
-		var ystart int
-		var yend int
-
-		if len(str) == 4 {
-			xstart, _ = strconv.Atoi(str[0])
-			xend, _ = strconv.Atoi(str[1])
-			ystart, _ = strconv.Atoi(str[2])
-			yend, _ = strconv.Atoi(str[3])
-		} else {
-			xend, _ = strconv.Atoi(str[0])
-			yend, _ = strconv.Atoi(str[1])
-		}
-
-		proc.Crop(xstart, xend, ystart, yend)
-	}
-
-	return &proc
-}
-
 func processImage(img image.Image, file string, outputPath string, proc processor.Processor) {
 	tensor := convert.ConvertIntoTensor(img)
+
 	iep := proc.Execute(&tensor)
 
 	context := convert.NewConversionContext()
 
-	conversor, err := context.GetConversor(img)
+	conversor, err := context.GetConversor(img, proc.GetColorModel())
 
 	if err != nil {
 		log.Fatal(err.Error())
@@ -109,7 +61,7 @@ func processImage(img image.Image, file string, outputPath string, proc processo
 }
 
 func main() {
-	var config Config
+	var config *configs.Config = configs.GetConfig()
 
 	flag.StringVar(&config.Input, "i", "", "Input file")
 	flag.StringVar(&config.Output, "o", "", "Output file")
@@ -142,7 +94,7 @@ func main() {
 		log.Fatalf("error - %v\n", err.Error())
 	}
 
-	proc := parseConfig(config)
+	proc := config.ParseConfig()
 
 	output := config.Output
 
