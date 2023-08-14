@@ -21,19 +21,6 @@ type ProcessResult struct {
 	success  bool
 }
 
-type Config struct {
-	Input           string
-	Output          string
-	FlipY           bool
-	FlipX           bool
-	Transpose       bool
-	Grayscale       bool
-	TurnLeft        bool
-	TurnRight       bool
-	NearestNeighbor float64
-	Crop            string
-}
-
 func processImage(img image.Image, file string, outputPath string, proc processor.Processor) {
 	tensor := convert.ConvertIntoTensor(img)
 
