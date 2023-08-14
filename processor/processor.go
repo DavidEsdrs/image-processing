@@ -2,12 +2,15 @@ package processor
 
 import (
 	"fmt"
+	"image"
 	"image/color"
-
-	"github.com/DavidEsdrs/image-processing/utils"
 )
 
 type Processor interface {
+	// This function is util when one of the filters changes the color model
+	// So further - when getting the correct conversor - we can use this function
+	// and get the correct color model
+	GetColorModel() color.Model
 	Crop(xstart, xend, ystart, yend int)
 	FlipX()
 	FlipY()
@@ -22,7 +25,13 @@ type Processor interface {
 type Process func(*[][]color.Color)
 
 type ImageProcessor struct {
-	processes []Process
+	ColorModel     color.Model
+	SubsampleRatio image.YCbCrSubsampleRatio
+	processes      []Process
+}
+
+func (ip *ImageProcessor) GetColorModel() color.Model {
+	return ip.ColorModel
 }
 
 func crop(pImg *[][]color.Color, xstart, xend, ystart, yend int) {
@@ -205,10 +214,13 @@ func getAdjacentPixels(pImg *[][]color.Color, x int, y int) [4]color.Color {
 }
 
 func (ip *ImageProcessor) BlackAndWhite() {
-	ip.processes = append(ip.processes, blackAndWhite)
+	bAw := func(pImg *[][]color.Color) {
+		blackAndWhite(pImg, ip)
+	}
+	ip.processes = append(ip.processes, bAw)
 }
 
-func blackAndWhite(pImg *[][]color.Color) {
+func blackAndWhite(pImg *[][]color.Color, ip *ImageProcessor) {
 	img := *pImg
 
 	var rows int
@@ -225,20 +237,14 @@ func blackAndWhite(pImg *[][]color.Color) {
 		for j := 0; j < cols; j++ {
 			originalColor := img[i][j]
 
-			r, g, b, _ := originalColor.RGBA()
-
-			maxValue := uint32(utils.Max(r, g, b))
-			minValue := uint32(utils.Min(r, g, b))
-
-			grayValue := uint8((maxValue + minValue) / 2 >> 8)
-
-			newColor := color.RGBA{grayValue, grayValue, grayValue, 255}
+			newColor := color.Gray16Model.Convert(originalColor)
 
 			res[i][j] = newColor
 		}
 	}
 
 	*pImg = res
+	ip.ColorModel = color.Gray16Model
 }
 
 func (ip *ImageProcessor) Execute(source *[][]color.Color) [][]color.Color {
