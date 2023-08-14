@@ -23,6 +23,8 @@ type Config struct {
 
 	Ssr            int
 	SubsampleRatio image.YCbCrSubsampleRatio
+
+	Quality int
 }
 
 func (cfg *Config) SetSubsampleRatio(ratio int) {
@@ -98,6 +100,10 @@ func (config *Config) ParseConfig() processor.Processor {
 	}
 	if config.Ssr != 0 {
 		config.SetSubsampleRatio(config.Ssr)
+	}
+	if config.Quality > 100 || config.Quality < 0 {
+		fmt.Printf("quality value too high or too low - default to 100\n")
+		config.Quality = 100
 	}
 
 	return &proc
