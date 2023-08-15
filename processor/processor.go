@@ -37,6 +37,16 @@ func (ip *ImageProcessor) GetColorModel() color.Model {
 func crop(pImg *[][]color.Color, xstart, xend, ystart, yend int) {
 	img := *pImg
 
+	rect := image.Rect(0, 0, len(img[0]), len(img))
+
+	startPoint := image.Point{X: xstart, Y: ystart}
+	endPoint := image.Point{X: xend, Y: yend}
+
+	if !startPoint.In(rect) || !endPoint.In(rect) || endPoint.X == 0 || endPoint.Y == 0 {
+		fmt.Printf("Crop points are not in the image - crop won't happen\n")
+		return
+	}
+
 	res := make([][]color.Color, yend-ystart)
 
 	for i := range res {
