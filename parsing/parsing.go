@@ -3,7 +3,6 @@ package parsing
 import (
 	"fmt"
 	"image"
-	"strings"
 )
 
 type ConversionStrategy interface {
@@ -16,15 +15,11 @@ func NewParsingContext() *ParsingContext {
 	return &ParsingContext{}
 }
 
-func (cc *ParsingContext) GetConfig(file string) (ConversionStrategy, error) {
-	strs := strings.Split(file, ".")
-	ftype := strs[len(strs)-1]
-
-	switch ftype {
+func (cc *ParsingContext) GetConfig(format string) (ConversionStrategy, error) {
+	switch format {
 	case "png":
 		return &PngParsingStrategy{}, nil
-	case "jpeg":
-	case "jpg":
+	case "jpeg", "jpg":
 		return &JpgParsingStrategy{}, nil
 	}
 
