@@ -21,7 +21,7 @@ type ProcessResult struct {
 	success  bool
 }
 
-func processImage(img image.Image, file string, outputPath string, proc processor.Processor) {
+func processImage(img image.Image, format string, outputPath string, proc processor.Processor) {
 	tensor := convert.ConvertIntoTensor(img)
 
 	iep := proc.Execute(&tensor)
@@ -38,7 +38,7 @@ func processImage(img image.Image, file string, outputPath string, proc processo
 
 	pc := parsing.NewParsingContext()
 
-	config, err := pc.GetConfig(file)
+	config, err := pc.GetConfig(format)
 
 	if err != nil {
 		log.Fatal(err.Error())
@@ -76,7 +76,7 @@ func main() {
 
 	file := config.Input
 
-	img, err := loadImage(file)
+	img, format, err := loadImage(file)
 
 	if err != nil {
 		results[0] = ProcessResult{fileName: file, success: false}
@@ -88,24 +88,22 @@ func main() {
 	output := config.Output
 
 	// main process
-	processImage(img, file, output, proc)
-
-	fmt.Printf("process: image %v processed\n", file)
+	processImage(img, format, output, proc)
 
 	duration := time.Since(start)
 
-	fmt.Printf("completed: %v image processed - %v milliseconds\n", 1, duration.Milliseconds())
+	fmt.Printf("completed: image %v processed - %v\n", file, duration.String())
 }
 
-func loadImage(file string) (image.Image, error) {
+func loadImage(file string) (img image.Image, format string, err error) {
 	imgFile, err := os.Open(file)
 	if err != nil {
-		return nil, err
+		return
 	}
 	defer imgFile.Close()
-	img, _, err := image.Decode(imgFile)
+	img, format, err = image.Decode(imgFile)
 	if err != nil {
-		return nil, err
+		return
 	}
-	return img, nil
+	return
 }
