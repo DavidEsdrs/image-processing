@@ -70,7 +70,7 @@ func (config *Config) ParseConfig() processor.Processor {
 		proc.NearestNeighbor(float32(config.NearestNeighbor))
 	}
 	if config.Grayscale {
-		proc.BlackAndWhite()
+		proc.Grayscale16()
 	}
 	if config.TurnLeft {
 		proc.TurnLeft()
