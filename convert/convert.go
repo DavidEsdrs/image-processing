@@ -6,6 +6,7 @@ import (
 	"image/color"
 
 	"github.com/DavidEsdrs/image-processing/configs"
+	"github.com/DavidEsdrs/image-processing/logger"
 	"github.com/DavidEsdrs/image-processing/palette"
 )
 
@@ -13,10 +14,12 @@ type ConversionStrategy interface {
 	Convert(pixels [][]color.Color) image.Image
 }
 
-type ConversionContext struct{}
+type ConversionContext struct {
+	logger logger.Logger
+}
 
-func NewConversionContext() *ConversionContext {
-	return &ConversionContext{}
+func NewConversionContext(logger logger.Logger) *ConversionContext {
+	return &ConversionContext{logger}
 }
 
 func (cc *ConversionContext) GetConversor(img image.Image, mdl color.Model) (ConversionStrategy, error) {
@@ -28,24 +31,34 @@ func (cc *ConversionContext) GetConversor(img image.Image, mdl color.Model) (Con
 	}
 	switch model {
 	case color.Alpha16Model:
+		cc.logger.LogProcess("Given image has Alpha 16 bits color Model")
 		return &Alpha16Strategy{}, nil
 	case color.AlphaModel:
+		cc.logger.LogProcess("Given image has Alpha 8 bits color Model")
 		return &AlphaStrategy{}, nil
 	case color.CMYKModel:
+		cc.logger.LogProcess("Given image has CMYK color Model")
 		return &CmykStrategy{}, nil
 	case color.Gray16Model:
+		cc.logger.LogProcess("Given image has Gray 16 bits color Model")
 		return &Gray16Strategy{}, nil
 	case color.GrayModel:
+		cc.logger.LogProcess("Given image has Gray 8 bits color Model")
 		return &GrayStrategy{}, nil
 	case color.NRGBA64Model:
+		cc.logger.LogProcess("Given image has NRGBA 64 bits color Model")
 		return &Nrgba64Strategy{}, nil
 	case color.NRGBAModel:
+		cc.logger.LogProcess("Given image has NRGBA 32 bits color Model")
 		return &NrgbaStrategy{}, nil
 	case color.RGBA64Model:
+		cc.logger.LogProcess("Given image has RGBA 64 bits color Model")
 		return &Rgba64Strategy{}, nil
 	case color.RGBAModel:
+		cc.logger.LogProcess("Given image has RGBA 32 bits color Model")
 		return &RgbaStrategy{}, nil
 	case color.YCbCrModel:
+		cc.logger.LogProcess("Given image has YCbCr color Model")
 		cfg := configs.GetConfig()
 
 		// if the user passed a custom subsampling ratio, use it
@@ -61,8 +74,11 @@ func (cc *ConversionContext) GetConversor(img image.Image, mdl color.Model) (Con
 		// Assert
 		return nil, fmt.Errorf("unsupported color model")
 	case color.NYCbCrAModel:
+		cc.logger.LogProcess("Given image has NYCbCr color Model")
 		return nil, fmt.Errorf("unsupported color model")
 	}
+
+	cc.logger.LogProcess("Given image has a custom palette color Model")
 
 	// TODO: Add flag to ignore unknown color models
 	noIgnoreUnknown := true

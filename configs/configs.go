@@ -9,6 +9,7 @@ import (
 	"strconv"
 	"strings"
 
+	"github.com/DavidEsdrs/image-processing/logger"
 	"github.com/DavidEsdrs/image-processing/processor"
 )
 
@@ -70,7 +71,7 @@ func (cfg *Config) SetSubsampleRatio(ratio int) {
 
 var config *Config
 
-func (config *Config) ParseConfig() processor.Processor {
+func (config *Config) ParseConfig(logger logger.Logger) processor.Processor {
 	proc := processor.ImageProcessor{}
 
 	format := strings.Split(config.Output, ".")
@@ -82,24 +83,31 @@ func (config *Config) ParseConfig() processor.Processor {
 	config.OutputFormat = format[len(format)-1]
 
 	if config.Transpose {
+		logger.LogProcess("Applying 'transpose' filter")
 		proc.Transpose()
 	}
 	if config.FlipY {
+		logger.LogProcess("Applying 'flip Y' filter")
 		proc.FlipY()
 	}
 	if config.FlipX {
+		logger.LogProcess("Applying 'flip X' filter")
 		proc.FlipX()
 	}
 	if config.NearestNeighbor != 1.0 {
+		logger.LogProcessf("Resizing image to scale %v - nearest neighbor algorithm\n", config.NearestNeighbor)
 		proc.NearestNeighbor(float32(config.NearestNeighbor))
 	}
 	if config.Grayscale {
+		logger.LogProcess("Applying 'grayscale 16 bits' filter")
 		proc.Grayscale16()
 	}
 	if config.TurnLeft {
+		logger.LogProcess("Turning image left - 90 degrees")
 		proc.TurnLeft()
 	}
 	if config.TurnRight {
+		logger.LogProcess("Turning image right - 90 degrees")
 		proc.TurnRight()
 	}
 	if config.Crop != "" {
@@ -120,13 +128,15 @@ func (config *Config) ParseConfig() processor.Processor {
 			yend, _ = strconv.Atoi(str[1])
 		}
 
+		logger.LogProcessf("Cropping image - arguments: %v, %v, %v, %v", xstart, xend, ystart, yend)
 		proc.Crop(xstart, xend, ystart, yend)
 	}
 	if config.Ssr != 0 {
+		logger.LogProcessf("Changing subsampling ratio - using %v\n", config.Ssr)
 		config.SetSubsampleRatio(config.Ssr)
 	}
 	if config.Quality > 100 || config.Quality < 0 {
-		fmt.Printf("quality value too high or too low - default to 100\n")
+		logger.LogWarn("quality value too high or too low - default to 100\n")
 		config.Quality = 100
 	}
 	if config.Overlay != "" {
@@ -141,6 +151,7 @@ func (config *Config) ParseConfig() processor.Processor {
 		tensor := ConvertIntoTensor(img)
 		proc.Overlay = &tensor
 		proc.SetOverlay(config.DistTop, config.DistRight, config.DistBottom, config.DistLeft)
+		logger.LogProcess("Applying overlay")
 		imgFile.Close()
 	}
 
