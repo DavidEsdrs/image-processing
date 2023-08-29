@@ -36,7 +36,6 @@ type Config struct {
 	OutputFormat string
 
 	// Overlay
-	overlay    *[][]color.Color
 	DistTop    int
 	DistLeft   int
 	DistBottom int
