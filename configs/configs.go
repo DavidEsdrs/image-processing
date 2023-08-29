@@ -3,6 +3,7 @@ package configs
 import (
 	"fmt"
 	"image"
+	"log"
 	"strconv"
 	"strings"
 
@@ -10,6 +11,7 @@ import (
 )
 
 type Config struct {
+	// Filters
 	Input           string
 	Output          string
 	FlipY           bool
@@ -21,10 +23,14 @@ type Config struct {
 	NearestNeighbor float64
 	Crop            string
 
+	// YCbCr
 	Ssr            int
 	SubsampleRatio image.YCbCrSubsampleRatio
 
+	// JPEG
 	Quality int
+
+	OutputFormat string
 }
 
 func (cfg *Config) SetSubsampleRatio(ratio int) {
@@ -56,6 +62,14 @@ var config *Config
 
 func (config *Config) ParseConfig() processor.Processor {
 	proc := processor.ImageProcessor{}
+
+	format := strings.Split(config.Output, ".")
+
+	if len(format) <= 1 {
+		log.Fatal("Invalid output format")
+	}
+
+	config.OutputFormat = format[len(format)-1]
 
 	if config.Transpose {
 		proc.Transpose()
