@@ -8,10 +8,13 @@ import (
 	"github.com/DavidEsdrs/image-processing/filters"
 )
 
+type Overlay *[][]color.Color
+
 type ImageProcessor struct {
 	ColorModel     color.Model
 	SubsampleRatio image.YCbCrSubsampleRatio
 	processes      []Process
+	Overlay        Overlay
 }
 
 func (ip *ImageProcessor) GetColorModel() color.Model {
@@ -216,6 +219,34 @@ func (ip *ImageProcessor) Grayscale16() {
 		filters.Grayscale16(pImg, ip)
 	}
 	ip.processes = append(ip.processes, bAw)
+}
+
+func overlay(pImg *[][]color.Color, pOverlay *[][]color.Color, distTop, distRight, distBottom, distLeft int) {
+	img := *pImg
+	overlay := *pOverlay
+
+	rows := len(overlay)
+	cols := len(overlay[0])
+
+	imgRows := len(img)
+	imgCols := len(img[0])
+
+	for y := 0; y < rows && y+distTop < imgRows; y++ {
+		for x := 0; x < cols && x+distLeft < imgCols; x++ {
+			img[y+distTop][x+distLeft] = overlay[y][x]
+		}
+	}
+
+	println("overlay applied")
+
+	*pImg = img
+}
+
+func (ip *ImageProcessor) SetOverlay(distTop, distRight, distBottom, distLeft int) {
+	f := func(pImg *[][]color.Color) {
+		overlay(pImg, ip.Overlay, distTop, distRight, distBottom, distLeft)
+	}
+	ip.processes = append(ip.processes, f)
 }
 
 func (ip *ImageProcessor) Execute(source *[][]color.Color) [][]color.Color {

@@ -3,7 +3,9 @@ package configs
 import (
 	"fmt"
 	"image"
+	"image/color"
 	"log"
+	"os"
 	"strconv"
 	"strings"
 
@@ -22,6 +24,7 @@ type Config struct {
 	TurnRight       bool
 	NearestNeighbor float64
 	Crop            string
+	Overlay         string
 
 	// YCbCr
 	Ssr            int
@@ -31,6 +34,14 @@ type Config struct {
 	Quality int
 
 	OutputFormat string
+
+	// Overlay
+	overlay    *[][]color.Color
+	DistTop    int
+	DistLeft   int
+	DistBottom int
+	DistRight  int
+	Fill       bool
 }
 
 func (cfg *Config) SetSubsampleRatio(ratio int) {
@@ -119,8 +130,37 @@ func (config *Config) ParseConfig() processor.Processor {
 		fmt.Printf("quality value too high or too low - default to 100\n")
 		config.Quality = 100
 	}
+	if config.Overlay != "" {
+		imgFile, err := os.Open(config.Overlay)
+		if err != nil {
+			log.Fatal("Can't open overlay file")
+		}
+		img, _, err := image.Decode(imgFile)
+		if err != nil {
+			log.Fatal("Can't decode overlay file")
+		}
+		tensor := ConvertIntoTensor(img)
+		proc.Overlay = &tensor
+		proc.SetOverlay(config.DistTop, config.DistRight, config.DistBottom, config.DistLeft)
+		imgFile.Close()
+	}
 
 	return &proc
+}
+
+// Convert the image into a tensor to further manipulation
+func ConvertIntoTensor(img image.Image) [][]color.Color {
+	size := img.Bounds().Size()
+	pixels := make([][]color.Color, size.Y)
+
+	for y := 0; y < size.Y; y++ {
+		pixels[y] = make([]color.Color, size.X)
+		for x := 0; x < size.X; x++ {
+			pixels[y][x] = img.At(x, y)
+		}
+	}
+
+	return pixels
 }
 
 func GetConfig() *Config {
