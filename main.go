@@ -10,6 +10,8 @@ import (
 	"os"
 	"time"
 
+	_ "golang.org/x/image/webp"
+
 	"github.com/DavidEsdrs/image-processing/configs"
 	"github.com/DavidEsdrs/image-processing/convert"
 	"github.com/DavidEsdrs/image-processing/parsing"
@@ -21,7 +23,7 @@ type ProcessResult struct {
 	success  bool
 }
 
-func processImage(img image.Image, format string, outputPath string, proc processor.Processor) {
+func processImage(img image.Image, outputPath string, proc processor.Processor) {
 	tensor := convert.ConvertIntoTensor(img)
 
 	iep := proc.Execute(&tensor)
@@ -38,7 +40,7 @@ func processImage(img image.Image, format string, outputPath string, proc proces
 
 	pc := parsing.NewParsingContext()
 
-	config, err := pc.GetConfig(format)
+	config, err := pc.GetConfig()
 
 	if err != nil {
 		log.Fatal(err.Error())
@@ -63,6 +65,14 @@ func main() {
 	flag.IntVar(&config.Ssr, "ssr", 0, "Subsample ratio for images YCbCr. 444 = 4:4:4, 422 = 4:2:2, 420 = 4:2:0, 440 = 4:4:0, 411 = 4:1:1, 410 = 4:1:0")
 	flag.IntVar(&config.Quality, "q", 0, "Quality of the JPEG image. 1-100")
 
+	// overlay
+	flag.StringVar(&config.Overlay, "ov", "", "Image to overlay onto the input image")
+	flag.IntVar(&config.DistTop, "dt", 0, "Distance to the top")
+	flag.IntVar(&config.DistRight, "dr", 0, "Distance to the right")
+	flag.IntVar(&config.DistBottom, "db", 0, "Distance to the bottom")
+	flag.IntVar(&config.DistLeft, "dl", 0, "Distance to the left")
+	flag.BoolVar(&config.Fill, "fill", false, "Should the overlay fill in")
+
 	flag.Parse()
 
 	if config.Input == "" || config.Output == "" {
@@ -76,7 +86,7 @@ func main() {
 
 	file := config.Input
 
-	img, format, err := loadImage(file)
+	img, err := loadImage(file)
 
 	if err != nil {
 		results[0] = ProcessResult{fileName: file, success: false}
@@ -88,22 +98,19 @@ func main() {
 	output := config.Output
 
 	// main process
-	processImage(img, format, output, proc)
+	processImage(img, output, proc)
 
 	duration := time.Since(start)
 
 	fmt.Printf("completed: image %v processed - %v\n", file, duration.String())
 }
 
-func loadImage(file string) (img image.Image, format string, err error) {
+func loadImage(file string) (img image.Image, err error) {
 	imgFile, err := os.Open(file)
 	if err != nil {
 		return
 	}
 	defer imgFile.Close()
-	img, format, err = image.Decode(imgFile)
-	if err != nil {
-		return
-	}
+	img, _, err = image.Decode(imgFile)
 	return
 }
