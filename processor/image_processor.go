@@ -237,8 +237,6 @@ func overlay(pImg *[][]color.Color, pOverlay *[][]color.Color, distTop, distRigh
 		}
 	}
 
-	println("overlay applied")
-
 	*pImg = img
 }
 
