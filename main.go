@@ -2,7 +2,6 @@ package main
 
 import (
 	"flag"
-	"fmt"
 	"image"
 	_ "image/jpeg"
 	_ "image/png"
@@ -14,6 +13,7 @@ import (
 
 	"github.com/DavidEsdrs/image-processing/configs"
 	"github.com/DavidEsdrs/image-processing/convert"
+	"github.com/DavidEsdrs/image-processing/logger"
 	"github.com/DavidEsdrs/image-processing/parsing"
 	"github.com/DavidEsdrs/image-processing/processor"
 )
@@ -23,12 +23,13 @@ type ProcessResult struct {
 	success  bool
 }
 
-func processImage(img image.Image, outputPath string, proc processor.Processor) {
+func processImage(img image.Image, outputPath string, proc processor.Processor, logger logger.Logger) {
+	logger.LogProcess("Converting image into tensor")
 	tensor := convert.ConvertIntoTensor(img)
 
 	iep := proc.Execute(&tensor)
 
-	context := convert.NewConversionContext()
+	context := convert.NewConversionContext(logger)
 
 	conversor, err := context.GetConversor(img, proc.GetColorModel())
 
@@ -38,7 +39,7 @@ func processImage(img image.Image, outputPath string, proc processor.Processor) 
 
 	cImg := conversor.Convert(iep)
 
-	pc := parsing.NewParsingContext()
+	pc := parsing.NewParsingContext(logger)
 
 	config, err := pc.GetConfig()
 
@@ -46,14 +47,20 @@ func processImage(img image.Image, outputPath string, proc processor.Processor) 
 		log.Fatal(err.Error())
 	}
 
+	logger.LogProcessf("Saving image as %v", outputPath)
 	config.Save(cImg, outputPath)
 }
 
 func main() {
 	var config *configs.Config = configs.GetConfig()
+	var verbose bool
+
+	flag.BoolVar(&verbose, "v", false, "Verbose")
 
 	flag.StringVar(&config.Input, "i", "", "Input file")
 	flag.StringVar(&config.Output, "o", "", "Output file")
+
+	// filters
 	flag.BoolVar(&config.FlipY, "fy", false, "Flip y axis filter")
 	flag.BoolVar(&config.FlipX, "fx", false, "Flip x axis filter")
 	flag.BoolVar(&config.Transpose, "t", false, "Apply transpose process (rotate 270 degrees and flip Y axis)")
@@ -93,16 +100,18 @@ func main() {
 		log.Fatalf("error - %v\n", err.Error())
 	}
 
-	proc := config.ParseConfig()
+	logger := logger.NewLogger(verbose)
+
+	proc := config.ParseConfig(logger)
 
 	output := config.Output
 
 	// main process
-	processImage(img, output, proc)
+	processImage(img, output, proc, logger)
 
 	duration := time.Since(start)
 
-	fmt.Printf("completed: image %v processed - %v\n", file, duration.String())
+	logger.LogProcessf("completed: image %v processed - %v\n", file, duration.String())
 }
 
 func loadImage(file string) (img image.Image, err error) {
