@@ -37,11 +37,13 @@ type Config struct {
 	OutputFormat string
 
 	// Overlay
-	DistTop    int
-	DistLeft   int
-	DistBottom int
-	DistRight  int
-	Fill       bool
+	DistTop        int
+	DistLeft       int
+	DistBottom     int
+	DistRight      int
+	Fill           bool
+	overlayRect    image.Rectangle
+	backgroundRect image.Rectangle
 }
 
 func (cfg *Config) SetSubsampleRatio(ratio int) {
@@ -142,6 +144,11 @@ func (config *Config) ParseConfig(logger logger.Logger, inputImg image.Image) (p
 
 		tensor := conv.ConvertToModel(overlay)
 
+		config.overlayRect = overlay.Bounds()
+		config.backgroundRect = inputImg.Bounds()
+
+		config.ParseOverlayConfigs(&tensor)
+
 		proc.Overlay = &tensor
 
 		proc.SetOverlay(config.DistTop, config.DistRight, config.DistBottom, config.DistLeft)
@@ -174,7 +181,13 @@ func (config *Config) ParseConfig(logger logger.Logger, inputImg image.Image) (p
 
 func GetConfig() *Config {
 	if config == nil {
-		config = &Config{}
+		config = &Config{
+			DistTop:    0,
+			DistLeft:   0,
+			DistBottom: -1,
+			DistRight:  -1,
+			Fill:       false,
+		}
 	}
 	return config
 }
