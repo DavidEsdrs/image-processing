@@ -89,18 +89,3 @@ func (cc *ConversionContext) GetConversor(img image.Image, mdl color.Model) (Con
 
 	return nil, fmt.Errorf("unsupported color model")
 }
-
-// Convert the image into a tensor to further manipulation
-func ConvertIntoTensor(img image.Image) [][]color.Color {
-	size := img.Bounds().Size()
-	pixels := make([][]color.Color, size.Y)
-
-	for y := 0; y < size.Y; y++ {
-		pixels[y] = make([]color.Color, size.X)
-		for x := 0; x < size.X; x++ {
-			pixels[y][x] = img.At(x, y)
-		}
-	}
-
-	return pixels
-}
