@@ -37,6 +37,8 @@ For the build version you just need to install the [executable](https://github.c
 
 After installing the build in your machine. You can perform one or more operations (listed below) onto the images. The arguments -i (input) and -o (output) are mandatory. You can perform one or more operations.
 
+> **Note**: The file extension of the output determines the container of the file. It means that if your output is input.jpeg and you set the output as output.png, the container of the output will be PNG, and vice-versa.
+
 ```sh
 iproc -i [input] -o [output] [...args]
 ```
