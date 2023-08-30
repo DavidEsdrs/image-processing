@@ -1,3 +1,15 @@
+// This package determines the input image's color model and provides conversion
+// strategies for transforming tensors ([][]color.Color) back into images using
+// their respective color models.
+//
+// Each strategy implements a method "Convert" to convert the tensor ([][]color.Color)
+// back to an image as its own color model. For instance, the NRGBA64 strategy
+// will read each color.Color from the tensor as a NRGBA64 pixel and returning it
+// as an image.Image.
+//
+// This approach, ensures that the images will be converted back to the original
+// color model, i.e the original color model will be respected
+
 package convert
 
 import (
