@@ -83,18 +83,6 @@ func (config *Config) ParseConfig(logger logger.Logger, inputImg image.Image) (p
 
 	config.OutputFormat = format[len(format)-1]
 
-	if config.Transpose {
-		logger.LogProcess("Applying 'transpose' filter")
-		proc.Transpose()
-	}
-	if config.FlipY {
-		logger.LogProcess("Applying 'flip Y' filter")
-		proc.FlipY()
-	}
-	if config.FlipX {
-		logger.LogProcess("Applying 'flip X' filter")
-		proc.FlipX()
-	}
 	if config.NearestNeighbor != 1.0 {
 		logger.LogProcessf("Resizing image to scale %v - nearest neighbor algorithm\n", config.NearestNeighbor)
 		proc.NearestNeighbor(float32(config.NearestNeighbor))
@@ -102,14 +90,6 @@ func (config *Config) ParseConfig(logger logger.Logger, inputImg image.Image) (p
 	if config.Grayscale {
 		logger.LogProcess("Applying 'grayscale 16 bits' filter")
 		proc.Grayscale16()
-	}
-	if config.TurnLeft {
-		logger.LogProcess("Turning image left - 90 degrees")
-		proc.TurnLeft()
-	}
-	if config.TurnRight {
-		logger.LogProcess("Turning image right - 90 degrees")
-		proc.TurnRight()
 	}
 	if config.Crop != "" {
 		str := strings.Split(config.Crop, ",")
@@ -167,6 +147,26 @@ func (config *Config) ParseConfig(logger logger.Logger, inputImg image.Image) (p
 		proc.SetOverlay(config.DistTop, config.DistRight, config.DistBottom, config.DistLeft)
 
 		logger.LogProcess("Applying overlay")
+	}
+	if config.Transpose {
+		logger.LogProcess("Applying 'transpose' filter")
+		proc.Transpose()
+	}
+	if config.FlipY {
+		logger.LogProcess("Applying 'flip Y' filter")
+		proc.FlipY()
+	}
+	if config.FlipX {
+		logger.LogProcess("Applying 'flip X' filter")
+		proc.FlipX()
+	}
+	if config.TurnLeft {
+		logger.LogProcess("Turning image left - 90 degrees")
+		proc.TurnLeft()
+	}
+	if config.TurnRight {
+		logger.LogProcess("Turning image right - 90 degrees")
+		proc.TurnRight()
 	}
 
 	return &proc, nil
