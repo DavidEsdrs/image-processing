@@ -1,6 +1,12 @@
 package utils
 
-import "math"
+import (
+	"fmt"
+	"image"
+	"image/color"
+	"math"
+	"os"
+)
 
 type Number interface {
 	int | float32 | float64
@@ -27,11 +33,13 @@ func cubic(x float64) float64 {
 
 func normalize(kernel [][]float64, size int) [][]float64 {
 	sum := 0.0
+	// get the sum of the elements in the kernel
 	for i := 0; i < size; i++ {
 		for j := 0; j < size; j++ {
 			sum += kernel[i][j]
 		}
 	}
+	// divide each element by the total sum
 	for i := 0; i < size; i++ {
 		for j := 0; j < size; j++ {
 			kernel[i][j] /= sum
@@ -85,4 +93,32 @@ func Min(a, b, c uint32) uint32 {
 		return b
 	}
 	return c
+}
+
+func LoadImage(file string) (image.Image, error) {
+	imgFile, err := os.Open(file)
+	if err != nil {
+		return nil, fmt.Errorf("can't open overlay file")
+	}
+	defer imgFile.Close()
+	img, _, err := image.Decode(imgFile)
+	if err != nil {
+		return nil, fmt.Errorf("can't decode overlay file")
+	}
+	return img, nil
+}
+
+// Convert the image into a tensor to further manipulation
+func ConvertIntoTensor(img image.Image) [][]color.Color {
+	size := img.Bounds().Size()
+	pixels := make([][]color.Color, size.Y)
+
+	for y := 0; y < size.Y; y++ {
+		pixels[y] = make([]color.Color, size.X)
+		for x := 0; x < size.X; x++ {
+			pixels[y][x] = img.At(x, y)
+		}
+	}
+
+	return pixels
 }
