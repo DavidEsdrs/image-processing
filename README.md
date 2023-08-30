@@ -1,6 +1,8 @@
 # Image processing
 
-This project is intended to offer a set of basic features on image processing. It is a tool for image processing.
+This project is intended to offer a set of basic features on image processing. It is a tool for image processing. 
+
+> **Note**: At the moment, it  only supports JPEG and PNG
 
 ## Features 🌟
 
