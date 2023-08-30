@@ -113,6 +113,15 @@ func (config *Config) ParseConfig(logger logger.Logger, inputImg image.Image) (p
 			log.Fatal("wrong arguments count for cropping")
 		}
 
+		rect := inputImg.Bounds()
+
+		startPoint := image.Point{X: xstart, Y: ystart}
+		endPoint := image.Point{X: xend, Y: yend}
+
+		if !startPoint.In(rect) || !endPoint.In(rect) || endPoint.X == 0 || endPoint.Y == 0 {
+			log.Fatal("Crop points are not in the image\n")
+		}
+
 		logger.LogProcessf("Cropping image - arguments: %v, %v, %v, %v", xstart, xend, ystart, yend)
 		proc.Crop(xstart, xend, ystart, yend)
 	}
