@@ -6,6 +6,7 @@ import (
 	_ "image/jpeg"
 	_ "image/png"
 	"log"
+	"os"
 	"time"
 
 	_ "golang.org/x/image/webp"
@@ -52,7 +53,8 @@ func processImage(img image.Image, outputPath string, proc processor.Processor, 
 }
 
 // set cli flags
-func SetFlags(config *configs.Config, verbose *bool) {
+func SetFlags(config *configs.Config, verbose *bool, help *bool) {
+	flag.BoolVar(help, "h", false, "Print tool usage")
 	flag.BoolVar(verbose, "v", false, "Verbose")
 
 	flag.StringVar(&config.Input, "i", "", "Input file")
@@ -82,10 +84,16 @@ func SetFlags(config *configs.Config, verbose *bool) {
 func main() {
 	var config *configs.Config = configs.GetConfig()
 	var verbose bool
+	var help bool
 
-	SetFlags(config, &verbose)
+	SetFlags(config, &verbose, &help)
 
 	flag.Parse()
+
+	if help {
+		flag.Usage()
+		os.Exit(0)
+	}
 
 	if config.Input == "" || config.Output == "" {
 		flag.Usage()
