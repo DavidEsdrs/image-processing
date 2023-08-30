@@ -53,6 +53,8 @@ func processImage(img image.Image, outputPath string, proc processor.Processor, 
 }
 
 // set cli flags
+//
+// TODO: Avoid using pointer to primitive args
 func SetFlags(config *configs.Config, verbose *bool, help *bool) {
 	flag.BoolVar(help, "h", false, "Print tool usage")
 	flag.BoolVar(verbose, "v", false, "Verbose")
@@ -91,13 +93,12 @@ func main() {
 	flag.Parse()
 
 	if help {
-		flag.Usage()
+		logger.Usage()
 		os.Exit(0)
 	}
 
 	if config.Input == "" || config.Output == "" {
-		flag.Usage()
-		log.Fatal("Input and output files are required.")
+		log.Fatal("input and output files are required.")
 	}
 
 	results := make([]ProcessResult, 1)
