@@ -106,9 +106,11 @@ func (config *Config) ParseConfig(logger logger.Logger, inputImg image.Image) (p
 			xend, _ = strconv.Atoi(str[1])
 			ystart, _ = strconv.Atoi(str[2])
 			yend, _ = strconv.Atoi(str[3])
-		} else {
+		} else if len(str) == 2 {
 			xend, _ = strconv.Atoi(str[0])
 			yend, _ = strconv.Atoi(str[1])
+		} else {
+			log.Fatal("wrong arguments count for cropping")
 		}
 
 		logger.LogProcessf("Cropping image - arguments: %v, %v, %v, %v", xstart, xend, ystart, yend)
