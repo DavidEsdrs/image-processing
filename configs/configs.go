@@ -3,14 +3,14 @@ package configs
 import (
 	"fmt"
 	"image"
-	"image/color"
 	"log"
-	"os"
 	"strconv"
 	"strings"
 
 	"github.com/DavidEsdrs/image-processing/logger"
+	"github.com/DavidEsdrs/image-processing/models"
 	"github.com/DavidEsdrs/image-processing/processor"
+	"github.com/DavidEsdrs/image-processing/utils"
 )
 
 type Config struct {
@@ -69,9 +69,10 @@ func (cfg *Config) SetSubsampleRatio(ratio int) {
 	fmt.Printf("Invalid subsample ratio: %v - default to 4:4:4\n", ratio)
 }
 
+// config singleton
 var config *Config
 
-func (config *Config) ParseConfig(logger logger.Logger) processor.Processor {
+func (config *Config) ParseConfig(logger logger.Logger, inputImg image.Image) (processor.Processor, error) {
 	proc := processor.ImageProcessor{}
 
 	format := strings.Split(config.Output, ".")
@@ -140,37 +141,35 @@ func (config *Config) ParseConfig(logger logger.Logger) processor.Processor {
 		config.Quality = 100
 	}
 	if config.Overlay != "" {
-		imgFile, err := os.Open(config.Overlay)
+		overlay, err := utils.LoadImage(config.Overlay)
+
 		if err != nil {
-			log.Fatal("Can't open overlay file")
+			return nil, err
 		}
-		img, _, err := image.Decode(imgFile)
+
+		model := overlay.ColorModel()
+
+		// convert tensor to the right color model (in that case, the overlay color model is converted to the input color model)
+		cc := models.ConverterContext{}
+
+		conv, err := cc.GetConverter(inputImg.ColorModel())
+
+		logger.LogProcessf("Overlay has %v color model", utils.ColorModelString(model))
+
 		if err != nil {
-			log.Fatal("Can't decode overlay file")
+			return nil, err
 		}
-		tensor := ConvertIntoTensor(img)
+
+		tensor := conv.ConvertToModel(overlay)
+
 		proc.Overlay = &tensor
+
 		proc.SetOverlay(config.DistTop, config.DistRight, config.DistBottom, config.DistLeft)
+
 		logger.LogProcess("Applying overlay")
-		imgFile.Close()
 	}
 
-	return &proc
-}
-
-// Convert the image into a tensor to further manipulation
-func ConvertIntoTensor(img image.Image) [][]color.Color {
-	size := img.Bounds().Size()
-	pixels := make([][]color.Color, size.Y)
-
-	for y := 0; y < size.Y; y++ {
-		pixels[y] = make([]color.Color, size.X)
-		for x := 0; x < size.X; x++ {
-			pixels[y][x] = img.At(x, y)
-		}
-	}
-
-	return pixels
+	return &proc, nil
 }
 
 func GetConfig() *Config {

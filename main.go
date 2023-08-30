@@ -6,7 +6,6 @@ import (
 	_ "image/jpeg"
 	_ "image/png"
 	"log"
-	"os"
 	"time"
 
 	_ "golang.org/x/image/webp"
@@ -16,6 +15,7 @@ import (
 	"github.com/DavidEsdrs/image-processing/logger"
 	"github.com/DavidEsdrs/image-processing/parsing"
 	"github.com/DavidEsdrs/image-processing/processor"
+	"github.com/DavidEsdrs/image-processing/utils"
 )
 
 type ProcessResult struct {
@@ -25,7 +25,7 @@ type ProcessResult struct {
 
 func processImage(img image.Image, outputPath string, proc processor.Processor, logger logger.Logger) {
 	logger.LogProcess("Converting image into tensor")
-	tensor := convert.ConvertIntoTensor(img)
+	tensor := utils.ConvertIntoTensor(img)
 
 	iep := proc.Execute(&tensor)
 
@@ -51,11 +51,9 @@ func processImage(img image.Image, outputPath string, proc processor.Processor, 
 	config.Save(cImg, outputPath)
 }
 
-func main() {
-	var config *configs.Config = configs.GetConfig()
-	var verbose bool
-
-	flag.BoolVar(&verbose, "v", false, "Verbose")
+// set cli flags
+func SetFlags(config *configs.Config, verbose *bool) {
+	flag.BoolVar(verbose, "v", false, "Verbose")
 
 	flag.StringVar(&config.Input, "i", "", "Input file")
 	flag.StringVar(&config.Output, "o", "", "Output file")
@@ -79,6 +77,13 @@ func main() {
 	flag.IntVar(&config.DistBottom, "db", 0, "Distance to the bottom")
 	flag.IntVar(&config.DistLeft, "dl", 0, "Distance to the left")
 	flag.BoolVar(&config.Fill, "fill", false, "Should the overlay fill in")
+}
+
+func main() {
+	var config *configs.Config = configs.GetConfig()
+	var verbose bool
+
+	SetFlags(config, &verbose)
 
 	flag.Parse()
 
@@ -93,7 +98,7 @@ func main() {
 
 	file := config.Input
 
-	img, err := loadImage(file)
+	img, err := utils.LoadImage(file)
 
 	if err != nil {
 		results[0] = ProcessResult{fileName: file, success: false}
@@ -102,7 +107,11 @@ func main() {
 
 	logger := logger.NewLogger(verbose)
 
-	proc := config.ParseConfig(logger)
+	proc, err := config.ParseConfig(logger, img)
+
+	if err != nil {
+		log.Fatal(err.Error())
+	}
 
 	output := config.Output
 
@@ -112,14 +121,4 @@ func main() {
 	duration := time.Since(start)
 
 	logger.LogProcessf("completed: image %v processed - %v\n", file, duration.String())
-}
-
-func loadImage(file string) (img image.Image, err error) {
-	imgFile, err := os.Open(file)
-	if err != nil {
-		return
-	}
-	defer imgFile.Close()
-	img, _, err = image.Decode(imgFile)
-	return
 }
