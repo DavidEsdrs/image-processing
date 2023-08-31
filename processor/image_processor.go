@@ -211,7 +211,7 @@ func (ip *ImageProcessor) Grayscale16() {
 	ip.processes = append(ip.processes, bAw)
 }
 
-func overlay(pImg *[][]color.Color, pOverlay *[][]color.Color, distTop, distRight, distBottom, distLeft int) {
+func overlay(pImg *[][]color.Color, pOverlay *[][]color.Color, distTop, distLeft int) {
 	img := *pImg
 	overlay := *pOverlay
 
@@ -230,9 +230,9 @@ func overlay(pImg *[][]color.Color, pOverlay *[][]color.Color, distTop, distRigh
 	*pImg = img
 }
 
-func (ip *ImageProcessor) SetOverlay(distTop, distRight, distBottom, distLeft int) {
+func (ip *ImageProcessor) SetOverlay(distTop, distLeft int) {
 	f := func(pImg *[][]color.Color) {
-		overlay(pImg, ip.Overlay, distTop, distRight, distBottom, distLeft)
+		overlay(pImg, ip.Overlay, distTop, distLeft)
 	}
 	ip.processes = append(ip.processes, f)
 }

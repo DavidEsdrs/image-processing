@@ -162,7 +162,7 @@ func (config *Config) ParseConfig(logger logger.Logger, inputImg image.Image) (p
 
 		proc.Overlay = &tensor
 
-		proc.SetOverlay(config.DistTop, config.DistRight, config.DistBottom, config.DistLeft)
+		proc.SetOverlay(config.DistTop, config.DistLeft)
 
 		logger.LogProcess("Applying overlay")
 	}
