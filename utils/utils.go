@@ -1,7 +1,6 @@
 package utils
 
 import (
-	"fmt"
 	"image"
 	"image/color"
 	"math"
@@ -100,12 +99,12 @@ func Min(a, b, c uint32) uint32 {
 func LoadImage(file string) (image.Image, error) {
 	imgFile, err := os.Open(file)
 	if err != nil {
-		return nil, fmt.Errorf("can't open overlay file")
+		return nil, err
 	}
 	defer imgFile.Close()
 	img, _, err := image.Decode(imgFile)
 	if err != nil {
-		return nil, fmt.Errorf("can't decode overlay file")
+		return nil, err
 	}
 	return img, nil
 }
