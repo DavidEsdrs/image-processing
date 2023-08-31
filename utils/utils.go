@@ -95,6 +95,8 @@ func Min(a, b, c uint32) uint32 {
 	return c
 }
 
+// Load image file with the given path - return an error and image.Image nil
+// if it fails
 func LoadImage(file string) (image.Image, error) {
 	imgFile, err := os.Open(file)
 	if err != nil {
