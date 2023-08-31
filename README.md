@@ -18,9 +18,11 @@ This project is intended to offer a set of basic features on image processing. I
   - [X] Nearest neighbor (low quality)
   - [ ] Bilinear interpolation
   - [ ] Bicubic interpolation
+- [X] Overlay
 - [ ] Blur
 - [ ] Sharpen
-- [ ] Other...
+- [ ] Saturation
+- [ ] Brightness
 
 ## Dev requirements 🔎
 
@@ -103,7 +105,27 @@ Representing xend and ysend.
 iproc -i [input] -o [output] -gs
 ```
 
-> **note**: If you prefer use the development version, you just need to clone this repository and change `iproc` for `go run main.go`.
+- Overlay (put image onto another):
+
+```sh
+iproc -i [input] -o [output] -ov [overlay]
+```
+
+Overlay is the path to the overlay image. The input image will be the background.
+You can pass any of the following flags (read the note):
+
+- `dt`:
+  - Distance from the top border of the overlay to the top border of the background
+- `dl`:
+  - Distance from the left border of the overlay to the left border of the background
+- `dr`:
+  - Distance from the right border of the overlay to the right border of the background
+- `db`:
+  - Distance from the bottom border of the overlay to the bottom border of the background
+
+> **note**:: You can adjust the position of the overlay relative to background image, negative values are allowed. Use one or two of the flags below. Note that `dt` (distance top) takes precedence over `db` (distance bottom), which means that if you give a non zero distance top, the `db` will be ignored, the same applies to `dl` and `dr` (`dl takes precedence over `dr`).
+
+> **note**: If you prefer using the development version, you just need to clone this repository and change `iproc` for `go run main.go`.
 
 > **More will be added soon** 😄
 
