@@ -1,3 +1,10 @@
+// This package is responsible to give strategies to saving the output in a given
+// container.
+//
+// If support to more container be added, it must be created a new strategy with
+// the name of the container and it must be added in the switch in the GetConfig
+// function below.
+
 package parsing
 
 import (
