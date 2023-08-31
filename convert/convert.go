@@ -27,10 +27,10 @@ type ConversionStrategy interface {
 }
 
 type ConversionContext struct {
-	logger logger.Logger
+	logger *logger.Logger
 }
 
-func NewConversionContext(logger logger.Logger) *ConversionContext {
+func NewConversionContext(logger *logger.Logger) *ConversionContext {
 	return &ConversionContext{logger}
 }
 
