@@ -65,11 +65,22 @@ iproc -i [input] -o [output] -fx
 iproc -i [input] -o [output] -t
 ```
 
-- Resize (nearest neighbor):
+- Resize (Nearest Neighbor):
+
+For resizing, you have two options: you can either use a `scale factor` or specify the dimensions you want for the resizing.
 
 ```sh
-iproc -i [input] -o [output] -nn [factor]
+iproc -i [input] -o [output] -nn -f [factor]
 ```
+
+In the example above, the boolean flag nn indicates the use of the nearest neighbor algorithm (this will become clearer as more scaling algorithms are added). The f stands for a floating-point number, representing the scale factor for both width and height adjustments.
+Alternatively, you can provide the dimensions directly:
+
+```sh
+iproc -i [input] -o [output] -nn -width [width] -height [height]
+```
+
+Width and height must be integers, representing pixel counts for each dimension.
 
 **Note**: The factor of resize must be > 0. Note that the algorithm applied is the `nearest neighbor`, which is known to give pixelated results
 
@@ -123,7 +134,7 @@ You can pass any of the following flags (read the note):
 - `db`:
   - Distance from the bottom border of the overlay to the bottom border of the background
 
-> **note**:: You can adjust the position of the overlay relative to background image, negative values are allowed. Use one or two of the flags below. Note that `dt` (distance top) takes precedence over `db` (distance bottom), which means that if you give a non zero distance top, the `db` will be ignored, the same applies to `dl` and `dr` (`dl takes precedence over `dr`).
+> **note**:: You can adjust the position of the overlay relative to background image, negative values are allowed. Use one or two of the flags below. Note that `dt` (distance top) takes precedence over `db` (distance bottom), which means that if you give distance top, the `db` will be ignored, the same applies to `dl` and `dr` (`dl takes precedence over `dr`).
 
 > **note**: If you prefer using the development version, you just need to clone this repository and change `iproc` for `go run main.go`.
 
