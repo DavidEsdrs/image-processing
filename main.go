@@ -42,7 +42,7 @@ func main() {
 	img, err := utils.LoadImage(config.Input)
 
 	if err != nil {
-		log.Fatalf("error - %v\n", err.Error())
+		log.Fatalf("error while loading input file - %v\n", err.Error())
 	}
 
 	logger := logger.NewLogger(verbose)
