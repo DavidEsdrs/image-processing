@@ -44,8 +44,8 @@ func (cc ConverterContext) GetConverter(model color.Model) (interfaces.Converter
 	case color.YCbCrModel:
 		return &YcbcrStrategy{}, nil
 	case color.NYCbCrAModel:
-		return nil, fmt.Errorf("unsupported color model")
+		return nil, fmt.Errorf("unsupported color model - No support for NYCbCr yet")
 	}
 
-	return nil, fmt.Errorf("unsupported color model")
+	return nil, fmt.Errorf("unsupported color model - No support for Paletted images as background")
 }
