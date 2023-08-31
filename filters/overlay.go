@@ -17,7 +17,7 @@ type OverlayFilter struct {
 	backgroundRect                           image.Rectangle
 }
 
-func NewOverlayFilter(logger logger.Logger, overlay image.Image, background image.Image, distTop, distRight, distLeft, distBottom int) (OverlayFilter, error) {
+func NewOverlayFilter(logger logger.Logger, overlay, background image.Image, distTop, distRight, distLeft, distBottom int) (OverlayFilter, error) {
 	cc := models.ConverterContext{}
 	conv, err := cc.GetConverter(background.ColorModel())
 
@@ -68,10 +68,10 @@ func (ovf OverlayFilter) Execute(tensor *[][]color.Color) error {
 }
 
 func (ovf *OverlayFilter) parseOverlayConfigs(tensor *[][]color.Color) {
-	if (ovf.distBottom != -1 || ovf.distBottom != ovf.distTop) && ovf.distTop == 0 {
+	if ovf.distRight != math.MinInt32 {
 		ovf.parseHorizontalAxis()
 	}
-	if (ovf.distRight != -1 || ovf.distRight != ovf.distLeft) && ovf.distLeft == 0 {
+	if ovf.distBottom != math.MinInt32 {
 		ovf.parseVerticalAxis()
 	}
 	if ovf.distTop < 0 {
@@ -82,13 +82,13 @@ func (ovf *OverlayFilter) parseOverlayConfigs(tensor *[][]color.Color) {
 	}
 }
 
-func (cfg *OverlayFilter) parseVerticalAxis() {
+func (cfg *OverlayFilter) parseHorizontalAxis() {
 	ovPlustDist := cfg.distRight + cfg.overlayRect.Max.X
 	distToLeft := cfg.backgroundRect.Max.X - ovPlustDist
 	cfg.distLeft = distToLeft
 }
 
-func (cfg *OverlayFilter) parseHorizontalAxis() {
+func (cfg *OverlayFilter) parseVerticalAxis() {
 	ovPlustDist := cfg.distBottom + cfg.overlayRect.Max.Y
 	distToTop := cfg.backgroundRect.Max.Y - ovPlustDist
 	cfg.distTop = distToTop
