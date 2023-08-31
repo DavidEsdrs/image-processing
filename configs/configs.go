@@ -6,8 +6,8 @@ import (
 	"strconv"
 	"strings"
 
+	"github.com/DavidEsdrs/image-processing/filters"
 	"github.com/DavidEsdrs/image-processing/logger"
-	"github.com/DavidEsdrs/image-processing/models"
 	"github.com/DavidEsdrs/image-processing/processor"
 	"github.com/DavidEsdrs/image-processing/utils"
 )
@@ -73,8 +73,8 @@ func (cfg *Config) SetSubsampleRatio(ratio int) {
 // config singleton
 var config *Config
 
-func (config *Config) ParseConfig(logger logger.Logger, inputImg image.Image) (processor.Processor, error) {
-	proc := processor.ImageProcessor{}
+func (config *Config) ParseConfig(logger logger.Logger, inputImg image.Image) (*processor.Invoker, error) {
+	invoker := processor.Invoker{}
 
 	format := strings.Split(config.Output, ".")
 
@@ -89,11 +89,15 @@ func (config *Config) ParseConfig(logger logger.Logger, inputImg image.Image) (p
 			return nil, fmt.Errorf("invalid scale factor to nearest neighbor")
 		}
 		logger.LogProcessf("Resizing image to scale %v - nearest neighbor algorithm\n", config.NearestNeighbor)
-		proc.NearestNeighbor(float32(config.NearestNeighbor))
+
+		f := filters.NewNearestNeighborFilter(float32(config.NearestNeighbor))
+
+		invoker.AddProcess(f)
 	}
 	if config.Grayscale {
 		logger.LogProcess("Applying 'grayscale 16 bits' filter")
-		proc.Grayscale16()
+		f := filters.NewGrayscale16Filter(&invoker)
+		invoker.AddProcess(f)
 	}
 	if config.Crop != "" {
 		str := strings.Split(config.Crop, ",")
@@ -115,17 +119,14 @@ func (config *Config) ParseConfig(logger logger.Logger, inputImg image.Image) (p
 			return nil, fmt.Errorf("wrong arguments count for cropping")
 		}
 
-		rect := inputImg.Bounds()
+		f, err := filters.NewCropFilter(inputImg, xstart, xend, ystart, yend)
 
-		startPoint := image.Point{X: xstart, Y: ystart}
-		endPoint := image.Point{X: xend, Y: yend}
-
-		if !startPoint.In(rect) || !endPoint.In(rect) || endPoint.X == 0 || endPoint.Y == 0 {
-			return nil, fmt.Errorf("crop points are not in the image")
+		if err != nil {
+			return nil, err
 		}
 
 		logger.LogProcessf("Cropping image - arguments: %v, %v, %v, %v", xstart, xend, ystart, yend)
-		proc.Crop(xstart, xend, ystart, yend)
+		invoker.AddProcess(f)
 	}
 	if config.Ssr != 0 {
 		logger.LogProcessf("Changing subsampling ratio - using %v\n", config.Ssr)
@@ -142,54 +143,43 @@ func (config *Config) ParseConfig(logger logger.Logger, inputImg image.Image) (p
 			return nil, err
 		}
 
-		model := overlay.ColorModel()
-
-		// convert tensor to the right color model (in that case, the overlay color model is converted to the input color model)
-		cc := models.ConverterContext{}
-
-		conv, err := cc.GetConverter(inputImg.ColorModel())
-
-		logger.LogProcessf("Overlay has %v color model", utils.ColorModelString(model))
+		f, err := filters.NewOverlayFilter(logger, overlay, inputImg, config.DistTop, config.DistRight, config.DistLeft, config.DistBottom)
 
 		if err != nil {
 			return nil, err
 		}
 
-		tensor := conv.ConvertToModel(overlay)
-
-		config.overlayRect = overlay.Bounds()
-		config.backgroundRect = inputImg.Bounds()
-
-		config.ParseOverlayConfigs(&tensor)
-
-		proc.Overlay = &tensor
-
-		proc.SetOverlay(config.DistTop, config.DistLeft)
-
 		logger.LogProcess("Applying overlay")
+
+		invoker.AddProcess(f)
 	}
 	if config.Transpose {
 		logger.LogProcess("Applying 'transpose' filter")
-		proc.Transpose()
+		f := filters.NewTransposeFilter()
+		invoker.AddProcess(f)
 	}
 	if config.FlipY {
 		logger.LogProcess("Applying 'flip Y' filter")
-		proc.FlipY()
+		f := filters.NewFlipYFilter()
+		invoker.AddProcess(f)
 	}
 	if config.FlipX {
 		logger.LogProcess("Applying 'flip X' filter")
-		proc.FlipX()
+		f := filters.NewFlipXFilter()
+		invoker.AddProcess(f)
 	}
 	if config.TurnLeft {
 		logger.LogProcess("Turning image left - 90 degrees")
-		proc.TurnLeft()
+		f := filters.NewTurnLeftFilter()
+		invoker.AddProcess(f)
 	}
 	if config.TurnRight {
 		logger.LogProcess("Turning image right - 90 degrees")
-		proc.TurnRight()
+		f := filters.NewTurnRightFilter()
+		invoker.AddProcess(f)
 	}
 
-	return &proc, nil
+	return &invoker, nil
 }
 
 func GetConfig() *Config {

@@ -1,24 +1,31 @@
 package processor
 
-import (
-	"image/color"
-)
+import "image/color"
 
-type Processor interface {
-	// This function is util when one of the filters changes the color model
-	// So further - when getting the correct conversor - we can use this function
-	// and get the correct color model
-	GetColorModel() color.Model
-	SetColorModel(colorModel color.Model)
-	Crop(xstart, xend, ystart, yend int)
-	FlipX()
-	FlipY()
-	TurnLeft()
-	TurnRight()
-	Transpose()
-	Grayscale16()
-	NearestNeighbor(factor float32)
-	Execute(source *[][]color.Color) [][]color.Color
+type Command interface {
+	Execute(*[][]color.Color) error
 }
 
-type Process func(*[][]color.Color)
+type Invoker struct {
+	processes  []Command
+	ColorModel color.Model
+}
+
+func (i *Invoker) Invoke(tensor *[][]color.Color) *[][]color.Color {
+	for _, p := range i.processes {
+		p.Execute(tensor)
+	}
+	return tensor
+}
+
+func (i *Invoker) GetColorModel() color.Model {
+	return i.ColorModel
+}
+
+func (i *Invoker) SetColorModel(colorModel color.Model) {
+	i.ColorModel = colorModel
+}
+
+func (i *Invoker) AddProcess(c Command) {
+	i.processes = append(i.processes, c)
+}

@@ -69,11 +69,11 @@ func main() {
 	logger.LogProcessf("completed: image %v processed - output image: %v - %v\n", config.Input, config.Output, duration.String())
 }
 
-func processImage(img image.Image, outputPath string, proc processor.Processor, logger *logger.Logger) error {
+func processImage(img image.Image, outputPath string, proc *processor.Invoker, logger *logger.Logger) error {
 	logger.LogProcess("Converting image into tensor")
 	tensor := utils.ConvertIntoTensor(img)
 
-	iep := proc.Execute(&tensor)
+	iep := proc.Invoke(&tensor)
 
 	context := convert.NewConversionContext(logger)
 
@@ -83,7 +83,7 @@ func processImage(img image.Image, outputPath string, proc processor.Processor, 
 		return err
 	}
 
-	cImg := conversor.Convert(iep)
+	cImg := conversor.Convert(*iep)
 
 	pc := parsing.NewParsingContext(logger)
 
