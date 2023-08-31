@@ -6,9 +6,12 @@ import (
 	"os"
 
 	"github.com/DavidEsdrs/image-processing/configs"
+	"github.com/DavidEsdrs/image-processing/logger"
 )
 
-type JpgParsingStrategy struct{}
+type JpgParsingStrategy struct {
+	logger *logger.Logger
+}
 
 func (jps *JpgParsingStrategy) Save(img image.Image, outputPath string) error {
 	fg, err := os.Create(outputPath)
@@ -23,6 +26,9 @@ func (jps *JpgParsingStrategy) Save(img image.Image, outputPath string) error {
 		})
 	} else {
 		err = jpeg.Encode(fg, img, nil)
+	}
+	if err == nil {
+		jps.logger.LogProcess("Image successfully encoded as JPEG")
 	}
 	return err
 }

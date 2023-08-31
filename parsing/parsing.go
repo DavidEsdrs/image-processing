@@ -13,10 +13,10 @@ type ConversionStrategy interface {
 }
 
 type ParsingContext struct {
-	logger logger.Logger
+	logger *logger.Logger
 }
 
-func NewParsingContext(logger logger.Logger) *ParsingContext {
+func NewParsingContext(logger *logger.Logger) *ParsingContext {
 	return &ParsingContext{logger}
 }
 
@@ -26,10 +26,10 @@ func (cc *ParsingContext) GetConfig() (ConversionStrategy, error) {
 	switch format {
 	case "png":
 		cc.logger.LogProcess("Converting/parsing as PNG")
-		return &PngParsingStrategy{}, nil
+		return &PngParsingStrategy{logger: cc.logger}, nil
 	case "jpeg", "jpg":
 		cc.logger.LogProcess("Converting/parsing as JPEG")
-		return &JpgParsingStrategy{}, nil
+		return &JpgParsingStrategy{logger: cc.logger}, nil
 	}
 
 	return nil, fmt.Errorf("unknown file type")
