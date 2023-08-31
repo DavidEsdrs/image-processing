@@ -7,7 +7,7 @@ type NearestNeighborFilter struct {
 }
 
 func NewNearestNeighborFilter(factor float32) NearestNeighborFilter {
-	return NearestNeighborFilter{}
+	return NearestNeighborFilter{factor}
 }
 
 func (nn NearestNeighborFilter) Execute(tensor *[][]color.Color) error {
