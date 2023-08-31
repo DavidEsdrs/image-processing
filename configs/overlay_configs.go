@@ -10,10 +10,10 @@ import (
 )
 
 func (config *Config) ParseOverlayConfigs(tensor *[][]color.Color) {
-	if config.DistBottom != -1 && config.DistTop == 0 && config.DistBottom != config.DistTop {
+	if (config.DistBottom != -1 || config.DistBottom != config.DistTop) && config.DistTop == 0 {
 		parseHorizontalAxis(config)
 	}
-	if config.DistRight != -1 && config.DistLeft == 0 && config.DistRight != config.DistLeft {
+	if (config.DistRight != -1 || config.DistRight != config.DistLeft) && config.DistLeft == 0 {
 		parseVerticalAxis(config)
 	}
 	if config.DistTop < 0 {
