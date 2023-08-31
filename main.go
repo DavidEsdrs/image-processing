@@ -37,8 +37,10 @@ func main() {
 		os.Exit(0)
 	}
 
+	logger := logger.NewLogger(verbose)
+
 	if config.Input == "" || config.Output == "" {
-		log.Fatal("input and output files are required.")
+		logger.Fatal("input and output files are required.", 2)
 	}
 
 	start := time.Now()
@@ -48,8 +50,6 @@ func main() {
 	if err != nil {
 		log.Fatalf("error while loading input file - %v\n", err.Error())
 	}
-
-	logger := logger.NewLogger(verbose)
 
 	proc, err := config.ParseConfig(logger, img)
 
