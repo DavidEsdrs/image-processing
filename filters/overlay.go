@@ -68,17 +68,21 @@ func (ovf OverlayFilter) Execute(tensor *[][]color.Color) error {
 }
 
 func (ovf *OverlayFilter) parseOverlayConfigs(tensor *[][]color.Color) {
-	if ovf.distRight != math.MinInt32 {
+	if ovf.distRight != math.MinInt32 && ovf.distLeft == math.MinInt32 {
 		ovf.parseHorizontalAxis()
 	}
-	if ovf.distBottom != math.MinInt32 {
+	if ovf.distBottom != math.MinInt32 && ovf.distTop == math.MinInt32 {
 		ovf.parseVerticalAxis()
 	}
-	if ovf.distTop < 0 {
+	if ovf.distTop < 0 && ovf.distTop != math.MinInt32 {
 		ovf.adjustOverlayVerticalOffset(tensor)
+	} else if ovf.distTop < 0 {
+		ovf.distTop = 0
 	}
-	if ovf.distLeft < 0 {
+	if ovf.distLeft < 0 && ovf.distLeft != math.MinInt32 {
 		ovf.adjustOverlayHorizontalOffset(tensor)
+	} else if ovf.distLeft < 0 {
+		ovf.distLeft = 0
 	}
 }
 
