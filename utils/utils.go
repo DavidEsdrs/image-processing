@@ -9,7 +9,7 @@ import (
 )
 
 type Number interface {
-	int | float32 | float64
+	int | float32 | float64 | uint32 | uint64
 }
 
 func pow[T Number](base T, pow int) T {
