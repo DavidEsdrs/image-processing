@@ -19,11 +19,6 @@ import (
 	"github.com/DavidEsdrs/image-processing/utils"
 )
 
-type ProcessResult struct {
-	fileName string
-	success  bool
-}
-
 func processImage(img image.Image, outputPath string, proc processor.Processor, logger *logger.Logger) error {
 	logger.LogProcess("Converting image into tensor")
 	tensor := utils.ConvertIntoTensor(img)
@@ -102,8 +97,6 @@ func main() {
 		log.Fatal("input and output files are required.")
 	}
 
-	results := make([]ProcessResult, 1)
-
 	start := time.Now()
 
 	file := config.Input
@@ -111,7 +104,6 @@ func main() {
 	img, err := utils.LoadImage(file)
 
 	if err != nil {
-		results[0] = ProcessResult{fileName: file, success: false}
 		log.Fatalf("error - %v\n", err.Error())
 	}
 
