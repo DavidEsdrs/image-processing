@@ -19,6 +19,10 @@ import (
 	"github.com/DavidEsdrs/image-processing/utils"
 )
 
+// driver code
+// Note that application starts and end here - any errors through all the
+// application converges to the errors got there on the "if err != nil"
+// statements
 func main() {
 	var config *configs.Config = configs.GetConfig()
 	var verbose bool
@@ -62,7 +66,7 @@ func main() {
 
 	duration := time.Since(start)
 
-	logger.LogProcessf("completed: image %v processed - %v\n", config.Input, duration.String())
+	logger.LogProcessf("completed: image %v processed - output image: %v - %v\n", config.Input, config.Output, duration.String())
 }
 
 func processImage(img image.Image, outputPath string, proc processor.Processor, logger *logger.Logger) error {
