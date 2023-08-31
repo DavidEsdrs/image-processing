@@ -83,6 +83,12 @@ func (l *Logger) LogProcess(msg string) {
 	}
 }
 
+// logs the message and kills the process with the given status code
+func (l *Logger) Fatal(message string, status int) {
+	l.logger.Println(message)
+	os.Exit(status)
+}
+
 func (l *Logger) Usage() {
 	fmt.Print(usage)
 	os.Exit(0)
