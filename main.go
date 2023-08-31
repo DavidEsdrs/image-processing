@@ -39,9 +39,7 @@ func main() {
 
 	start := time.Now()
 
-	file := config.Input
-
-	img, err := utils.LoadImage(file)
+	img, err := utils.LoadImage(config.Input)
 
 	if err != nil {
 		log.Fatalf("error - %v\n", err.Error())
@@ -55,10 +53,8 @@ func main() {
 		log.Fatal(err.Error())
 	}
 
-	output := config.Output
-
 	// main process
-	err = processImage(img, output, proc, &logger)
+	err = processImage(img, config.Output, proc, &logger)
 
 	if err != nil {
 		log.Fatal(err)
@@ -66,7 +62,7 @@ func main() {
 
 	duration := time.Since(start)
 
-	logger.LogProcessf("completed: image %v processed - %v\n", file, duration.String())
+	logger.LogProcessf("completed: image %v processed - %v\n", config.Input, duration.String())
 }
 
 func processImage(img image.Image, outputPath string, proc processor.Processor, logger *logger.Logger) error {
