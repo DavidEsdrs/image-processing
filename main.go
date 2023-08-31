@@ -24,7 +24,7 @@ type ProcessResult struct {
 	success  bool
 }
 
-func processImage(img image.Image, outputPath string, proc processor.Processor, logger logger.Logger) {
+func processImage(img image.Image, outputPath string, proc processor.Processor, logger *logger.Logger) {
 	logger.LogProcess("Converting image into tensor")
 	tensor := utils.ConvertIntoTensor(img)
 
@@ -125,7 +125,7 @@ func main() {
 	output := config.Output
 
 	// main process
-	processImage(img, output, proc, logger)
+	processImage(img, output, proc, &logger)
 
 	duration := time.Since(start)
 
