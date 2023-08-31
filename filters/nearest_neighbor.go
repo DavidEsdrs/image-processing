@@ -1,29 +1,47 @@
 package filters
 
-import "image/color"
+import (
+	"image/color"
+)
 
 type NearestNeighborFilter struct {
-	factor float32
+	factor              float64
+	width               int
+	height              int
+	needCalculateFactor bool
 }
 
-func NewNearestNeighborFilter(factor float32) NearestNeighborFilter {
-	return NearestNeighborFilter{factor}
+func NewNearestNeighborFilter(factor float64, width, height int) NearestNeighborFilter {
+	nn := NearestNeighborFilter{factor: factor, width: width, height: height}
+	nn.needCalculateFactor = factor != 1
+	return nn
 }
 
 func (nn NearestNeighborFilter) Execute(tensor *[][]color.Color) error {
 	img := *tensor
 
-	proportion := int(1 / nn.factor)
-	rows := int(len(img) / proportion)
-	cols := int(len(img[0]) / proportion)
+	originalWidth := len(img[0])
+	originalHeight := len(img)
 
-	res := make([][]color.Color, rows)
+	if nn.needCalculateFactor {
+		nn.width = int(float64(originalWidth) * nn.factor)
+		nn.height = int(float64(originalHeight) * nn.factor)
+	}
 
-	for i := 0; i < rows; i++ {
-		res[i] = make([]color.Color, cols)
+	res := make([][]color.Color, nn.height)
 
-		for j := 0; j < cols; j++ {
-			res[i][j] = img[i*proportion][j*proportion]
+	x_ratio := (originalWidth<<16)/nn.width + 1
+	y_ratio := (originalHeight<<16)/nn.height + 1
+
+	var x2 int
+	var y2 int
+
+	for y := 0; y < nn.height; y++ {
+		res[y] = make([]color.Color, nn.width)
+		for x := 0; x < nn.width; x++ {
+			x2 = (x * x_ratio) >> 16
+			y2 = (y * y_ratio) >> 16
+			res[y][x] = img[y2][x2]
 		}
 	}
 

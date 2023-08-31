@@ -14,17 +14,22 @@ import (
 
 type Config struct {
 	// Filters
-	Input           string
-	Output          string
-	FlipY           bool
-	FlipX           bool
-	Transpose       bool
-	Grayscale       bool
-	TurnLeft        bool
-	TurnRight       bool
-	NearestNeighbor float64
-	Crop            string
-	Overlay         string
+	Input     string
+	Output    string
+	FlipY     bool
+	FlipX     bool
+	Transpose bool
+	Grayscale bool
+	TurnLeft  bool
+	TurnRight bool
+	Crop      string
+	Overlay   string
+
+	// Resize
+	NearestNeighbor bool
+	Width           int
+	Height          int
+	Factor          float64
 
 	// YCbCr
 	Ssr            int
@@ -70,13 +75,18 @@ func (config *Config) ParseConfig(logger logger.Logger, inputImg image.Image) (*
 
 	config.OutputFormat = format[len(format)-1]
 
-	if config.NearestNeighbor != 1.0 {
-		if config.NearestNeighbor <= 0 {
+	if config.NearestNeighbor {
+		if config.Width < 0 || config.Height < 0 {
 			return nil, fmt.Errorf("invalid scale factor to nearest neighbor")
 		}
-		logger.LogProcessf("Resizing image to scale %v - nearest neighbor algorithm\n", config.NearestNeighbor)
 
-		f := filters.NewNearestNeighborFilter(float32(config.NearestNeighbor))
+		if config.Factor != 1 {
+			logger.LogProcessf("Resizing image to scale %v - nearest neighbor algorithm\n", config.Factor)
+		} else {
+			logger.LogProcessf("Resizing image to dimensions %vx%v - nearest neighbor algorithm\n", config.Width, config.Height)
+		}
+
+		f := filters.NewNearestNeighborFilter(config.Factor, config.Width, config.Height)
 
 		invoker.AddProcess(f)
 	}
@@ -129,7 +139,7 @@ func (config *Config) ParseConfig(logger logger.Logger, inputImg image.Image) (*
 			return nil, err
 		}
 
-		f, err := filters.NewOverlayFilter(logger, overlay, inputImg, config.DistTop, config.DistRight, config.DistLeft, config.DistBottom)
+		f, err := filters.NewOverlayFilter(logger, overlay, inputImg, config.DistTop, config.DistRight, config.DistLeft, config.DistBottom, config.Fill)
 
 		if err != nil {
 			return nil, err

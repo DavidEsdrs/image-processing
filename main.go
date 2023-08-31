@@ -120,10 +120,15 @@ func setFlags(config *configs.Config, verbose *bool, help *bool) {
 	flag.BoolVar(&config.TurnLeft, "tl", false, "Rotate 90 degrees counterclockwise")
 	flag.BoolVar(&config.TurnRight, "tr", false, "Rotate 90 degrees clockwise")
 	flag.BoolVar(&config.Grayscale, "gs", false, "Apply grayscale filter")
-	flag.Float64Var(&config.NearestNeighbor, "nn", 1.0, "Apply nearest neighbor resize algorithm")
 	flag.StringVar(&config.Crop, "c", "", "Crop image at given coordinates. Ex.: \"-c 0,1000,0,200\", xstart,xend,ystart,yend or \"-c 1000,200\", xend,yend (x and y start default to 0)")
 	flag.IntVar(&config.Ssr, "ssr", 0, "Subsample ratio for images YCbCr. 444 = 4:4:4, 422 = 4:2:2, 420 = 4:2:0, 440 = 4:4:0, 411 = 4:1:1, 410 = 4:1:0")
 	flag.IntVar(&config.Quality, "q", 0, "Quality of the JPEG image. 1-100")
+
+	// Resize
+	flag.BoolVar(&config.NearestNeighbor, "nn", false, "Apply nearest neighbor resize algorithm")
+	flag.IntVar(&config.Width, "width", math.MaxInt32, "Width")
+	flag.IntVar(&config.Height, "height", math.MaxInt32, "Height")
+	flag.Float64Var(&config.Factor, "f", 1, "Scale factor")
 
 	// overlay
 	flag.StringVar(&config.Overlay, "ov", "", "Image to overlay onto the input image")
