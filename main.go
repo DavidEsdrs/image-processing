@@ -24,7 +24,7 @@ type ProcessResult struct {
 	success  bool
 }
 
-func processImage(img image.Image, outputPath string, proc processor.Processor, logger *logger.Logger) {
+func processImage(img image.Image, outputPath string, proc processor.Processor, logger *logger.Logger) error {
 	logger.LogProcess("Converting image into tensor")
 	tensor := utils.ConvertIntoTensor(img)
 
@@ -35,7 +35,7 @@ func processImage(img image.Image, outputPath string, proc processor.Processor, 
 	conversor, err := context.GetConversor(img, proc.GetColorModel())
 
 	if err != nil {
-		log.Fatal(err.Error())
+		return err
 	}
 
 	cImg := conversor.Convert(iep)
@@ -45,11 +45,12 @@ func processImage(img image.Image, outputPath string, proc processor.Processor, 
 	config, err := pc.GetConfig()
 
 	if err != nil {
-		log.Fatal(err.Error())
+		return err
 	}
 
 	logger.LogProcessf("Saving image as %v", outputPath)
 	config.Save(cImg, outputPath)
+	return nil
 }
 
 // set cli flags
@@ -125,7 +126,11 @@ func main() {
 	output := config.Output
 
 	// main process
-	processImage(img, output, proc, &logger)
+	err = processImage(img, output, proc, &logger)
+
+	if err != nil {
+		log.Fatal(err)
+	}
 
 	duration := time.Since(start)
 
