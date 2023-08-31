@@ -45,33 +45,21 @@ type Config struct {
 	backgroundRect image.Rectangle
 }
 
-func (cfg *Config) SetSubsampleRatio(ratio int) {
-	switch ratio {
-	case 444, 5:
-		cfg.SubsampleRatio = image.YCbCrSubsampleRatio444
-		return
-	case 422, 4:
-		cfg.SubsampleRatio = image.YCbCrSubsampleRatio422
-		return
-	case 420, 3:
-		cfg.SubsampleRatio = image.YCbCrSubsampleRatio420
-		return
-	case 440, 2:
-		cfg.SubsampleRatio = image.YCbCrSubsampleRatio440
-		return
-	case 411, 1:
-		cfg.SubsampleRatio = image.YCbCrSubsampleRatio411
-		return
-	case 410, 0:
-		cfg.SubsampleRatio = image.YCbCrSubsampleRatio410
-		return
-	}
-	cfg.SubsampleRatio = image.YCbCrSubsampleRatio444
-	fmt.Printf("Invalid subsample ratio: %v - default to 4:4:4\n", ratio)
-}
-
 // config singleton
 var config *Config
+
+func GetConfig() *Config {
+	if config == nil {
+		config = &Config{
+			DistTop:    0,
+			DistLeft:   0,
+			DistBottom: -1,
+			DistRight:  -1,
+			Fill:       false,
+		}
+	}
+	return config
+}
 
 func (config *Config) ParseConfig(logger logger.Logger, inputImg image.Image) (*processor.Invoker, error) {
 	invoker := processor.Invoker{}
@@ -182,15 +170,27 @@ func (config *Config) ParseConfig(logger logger.Logger, inputImg image.Image) (*
 	return &invoker, nil
 }
 
-func GetConfig() *Config {
-	if config == nil {
-		config = &Config{
-			DistTop:    0,
-			DistLeft:   0,
-			DistBottom: -1,
-			DistRight:  -1,
-			Fill:       false,
-		}
+func (cfg *Config) SetSubsampleRatio(ratio int) {
+	switch ratio {
+	case 444, 5:
+		cfg.SubsampleRatio = image.YCbCrSubsampleRatio444
+		return
+	case 422, 4:
+		cfg.SubsampleRatio = image.YCbCrSubsampleRatio422
+		return
+	case 420, 3:
+		cfg.SubsampleRatio = image.YCbCrSubsampleRatio420
+		return
+	case 440, 2:
+		cfg.SubsampleRatio = image.YCbCrSubsampleRatio440
+		return
+	case 411, 1:
+		cfg.SubsampleRatio = image.YCbCrSubsampleRatio411
+		return
+	case 410, 0:
+		cfg.SubsampleRatio = image.YCbCrSubsampleRatio410
+		return
 	}
-	return config
+	cfg.SubsampleRatio = image.YCbCrSubsampleRatio444
+	fmt.Printf("Invalid subsample ratio: %v - default to 4:4:4\n", ratio)
 }
