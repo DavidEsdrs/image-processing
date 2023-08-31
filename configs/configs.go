@@ -86,6 +86,9 @@ func (config *Config) ParseConfig(logger logger.Logger, inputImg image.Image) (p
 	config.OutputFormat = format[len(format)-1]
 
 	if config.NearestNeighbor != 1.0 {
+		if config.NearestNeighbor <= 0 {
+			log.Fatal("invalid scale factor to nearest neighbor")
+		}
 		logger.LogProcessf("Resizing image to scale %v - nearest neighbor algorithm\n", config.NearestNeighbor)
 		proc.NearestNeighbor(float32(config.NearestNeighbor))
 	}

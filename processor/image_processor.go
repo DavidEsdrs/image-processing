@@ -1,7 +1,6 @@
 package processor
 
 import (
-	"fmt"
 	"image"
 	"image/color"
 
@@ -162,11 +161,6 @@ func (ip *ImageProcessor) Transpose() {
 
 func nearestNeighbor(pImg *[][]color.Color, factor float32) {
 	img := *pImg
-
-	if factor <= 0 {
-		fmt.Printf("factor is less than or equal to 0 - resize won't happen")
-		return
-	}
 
 	proportion := int(1 / factor)
 	rows := int(len(img) / proportion)
