@@ -11,11 +11,14 @@ type Invoker struct {
 	ColorModel color.Model
 }
 
-func (i *Invoker) Invoke(tensor *[][]color.Color) *[][]color.Color {
+func (i *Invoker) Invoke(tensor *[][]color.Color) (*[][]color.Color, error) {
 	for _, p := range i.processes {
-		p.Execute(tensor)
+		err := p.Execute(tensor)
+		if err != nil {
+			return nil, err
+		}
 	}
-	return tensor
+	return tensor, nil
 }
 
 func (i *Invoker) GetColorModel() color.Model {
