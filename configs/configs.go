@@ -3,7 +3,6 @@ package configs
 import (
 	"fmt"
 	"image"
-	"log"
 	"strconv"
 	"strings"
 
@@ -80,14 +79,14 @@ func (config *Config) ParseConfig(logger logger.Logger, inputImg image.Image) (p
 	format := strings.Split(config.Output, ".")
 
 	if len(format) <= 1 {
-		log.Fatal("Invalid output format")
+		return nil, fmt.Errorf("invalid output format")
 	}
 
 	config.OutputFormat = format[len(format)-1]
 
 	if config.NearestNeighbor != 1.0 {
 		if config.NearestNeighbor <= 0 {
-			log.Fatal("invalid scale factor to nearest neighbor")
+			return nil, fmt.Errorf("invalid scale factor to nearest neighbor")
 		}
 		logger.LogProcessf("Resizing image to scale %v - nearest neighbor algorithm\n", config.NearestNeighbor)
 		proc.NearestNeighbor(float32(config.NearestNeighbor))
@@ -113,7 +112,7 @@ func (config *Config) ParseConfig(logger logger.Logger, inputImg image.Image) (p
 			xend, _ = strconv.Atoi(str[0])
 			yend, _ = strconv.Atoi(str[1])
 		} else {
-			log.Fatal("wrong arguments count for cropping")
+			return nil, fmt.Errorf("wrong arguments count for cropping")
 		}
 
 		rect := inputImg.Bounds()
@@ -122,7 +121,7 @@ func (config *Config) ParseConfig(logger logger.Logger, inputImg image.Image) (p
 		endPoint := image.Point{X: xend, Y: yend}
 
 		if !startPoint.In(rect) || !endPoint.In(rect) || endPoint.X == 0 || endPoint.Y == 0 {
-			log.Fatal("Crop points are not in the image\n")
+			return nil, fmt.Errorf("crop points are not in the image")
 		}
 
 		logger.LogProcessf("Cropping image - arguments: %v, %v, %v, %v", xstart, xend, ystart, yend)
