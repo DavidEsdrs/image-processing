@@ -127,9 +127,9 @@ func setFlags(config *configs.Config, verbose *bool, help *bool) {
 
 	// overlay
 	flag.StringVar(&config.Overlay, "ov", "", "Image to overlay onto the input image")
-	flag.IntVar(&config.DistTop, "dt", 0, "Distance to the top")
+	flag.IntVar(&config.DistTop, "dt", math.MinInt32, "Distance to the top")
 	flag.IntVar(&config.DistRight, "dr", math.MinInt32, "Distance to the right")
 	flag.IntVar(&config.DistBottom, "db", math.MinInt32, "Distance to the bottom")
-	flag.IntVar(&config.DistLeft, "dl", 0, "Distance to the left")
+	flag.IntVar(&config.DistLeft, "dl", math.MinInt32, "Distance to the left")
 	flag.BoolVar(&config.Fill, "fill", false, "Should the overlay fill in")
 }
