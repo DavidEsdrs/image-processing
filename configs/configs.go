@@ -36,13 +36,11 @@ type Config struct {
 	OutputFormat string
 
 	// Overlay
-	DistTop        int
-	DistLeft       int
-	DistBottom     int
-	DistRight      int
-	Fill           bool
-	overlayRect    image.Rectangle
-	backgroundRect image.Rectangle
+	DistTop    int
+	DistLeft   int
+	DistBottom int
+	DistRight  int
+	Fill       bool
 }
 
 // config singleton
