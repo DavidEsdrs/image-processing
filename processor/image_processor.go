@@ -187,17 +187,6 @@ func (ip *ImageProcessor) NearestNeighbor(factor float32) {
 	ip.processes = append(ip.processes, p)
 }
 
-func getAdjacentPixels(pImg *[][]color.Color, x int, y int) [4]color.Color {
-	img := *pImg
-	var res [4]color.Color
-	// get pixels around target pixel
-	res[0] = img[x-1][y]
-	res[1] = img[x][y+1]
-	res[2] = img[x+1][y]
-	res[3] = img[x][y-1]
-	return res
-}
-
 func (ip *ImageProcessor) Grayscale16() {
 	bAw := func(pImg *[][]color.Color) {
 		filters.Grayscale16(pImg, ip)
