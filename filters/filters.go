@@ -9,11 +9,8 @@ type ProcessorWithColorModel interface {
 func Grayscale16(pImg *[][]color.Color, ip ProcessorWithColorModel) {
 	img := *pImg
 
-	var rows int
-	var cols int
-
-	rows = int(len(img))
-	cols = int(len(img[0]))
+	rows := int(len(img))
+	cols := int(len(img[0]))
 
 	res := make([][]color.Color, rows)
 
@@ -36,11 +33,8 @@ func Grayscale16(pImg *[][]color.Color, ip ProcessorWithColorModel) {
 func Grayscale8(pImg *[][]color.Color, ip ProcessorWithColorModel) {
 	img := *pImg
 
-	var rows int
-	var cols int
-
-	rows = int(len(img))
-	cols = int(len(img[0]))
+	rows := int(len(img))
+	cols := int(len(img[0]))
 
 	res := make([][]color.Color, rows)
 
