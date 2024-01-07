@@ -12,6 +12,10 @@ import (
 	"github.com/DavidEsdrs/image-processing/utils"
 )
 
+var ErrInvalidOutputFormat = fmt.Errorf("invalid output format")
+var ErrInvalidScaleFactor = fmt.Errorf("invalid scale factor")
+var ErrWrongArgsCountForCropping = fmt.Errorf("wrong arguments count for cropping")
+
 type Config struct {
 	// Filters
 	Input     string
@@ -70,18 +74,18 @@ func (config *Config) ParseConfig(logger logger.Logger, inputImg image.Image) (*
 	format := strings.Split(config.Output, ".")
 
 	if len(format) <= 1 {
-		return nil, fmt.Errorf("invalid output format")
+		return nil, ErrInvalidOutputFormat
 	}
 
 	config.OutputFormat = format[len(format)-1]
 
 	if !isValidImageType(config.OutputFormat) {
-		return nil, fmt.Errorf("invalid output format")
+		return nil, ErrInvalidOutputFormat
 	}
 
 	if config.NearestNeighbor {
 		if config.Width < 0 || config.Height < 0 || config.Width > 7680 || config.Height > 4320 {
-			return nil, fmt.Errorf("invalid scale factor to nearest neighbor")
+			return nil, ErrInvalidScaleFactor
 		}
 
 		if config.Factor != 1 {
@@ -116,7 +120,7 @@ func (config *Config) ParseConfig(logger logger.Logger, inputImg image.Image) (*
 			xend, _ = strconv.Atoi(str[0])
 			yend, _ = strconv.Atoi(str[1])
 		} else {
-			return nil, fmt.Errorf("wrong arguments count for cropping")
+			return nil, ErrWrongArgsCountForCropping
 		}
 
 		f, err := filters.NewCropFilter(inputImg, xstart, xend, ystart, yend)
