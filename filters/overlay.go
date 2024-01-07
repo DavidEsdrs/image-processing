@@ -11,6 +11,7 @@ import (
 )
 
 type OverlayFilter struct {
+	logger                                   logger.Logger
 	overlay                                  *[][]color.Color
 	distTop, distRight, distLeft, distBottom int
 	overlayRect                              image.Rectangle
@@ -40,6 +41,7 @@ func NewOverlayFilter(logger logger.Logger, overlay, background image.Image, dis
 		distBottom:     distBottom,
 		overlayRect:    overlayRect,
 		backgroundRect: backgroundRect,
+		logger:         logger,
 	}
 
 	ovf.parseOverlayConfigs(&tensor)

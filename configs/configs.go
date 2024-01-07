@@ -139,7 +139,7 @@ func (config *Config) ParseConfig(logger logger.Logger, inputImg image.Image) (*
 			return nil, err
 		}
 
-		f, err := filters.NewOverlayFilter(logger, overlay, inputImg, config.DistTop, config.DistRight, config.DistLeft, config.DistBottom, config.Fill)
+		f, err := filters.NewOverlayFilter(logger, overlay, inputImg, config.DistTop, config.DistRight, config.DistLeft, config.DistBottom)
 
 		if err != nil {
 			return nil, err
