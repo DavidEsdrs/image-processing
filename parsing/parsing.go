@@ -37,6 +37,9 @@ func (cc *ParsingContext) GetConfig() (ConversionStrategy, error) {
 	case "jpeg", "jpg":
 		cc.logger.LogProcess("Converting/parsing as JPEG")
 		return &JpgParsingStrategy{logger: cc.logger}, nil
+	case "gif":
+		cc.logger.LogProcess("Converting/parsing as GIF")
+		return &GifParsingStrategy{logger: cc.logger}, nil
 	}
 
 	return nil, fmt.Errorf("unknown file type")
