@@ -213,7 +213,7 @@ func (cfg *Config) SetSubsampleRatio(ratio int) {
 
 func isValidImageType(t string) bool {
 	switch t {
-	case "png", "jpeg", "jpg":
+	case "png", "jpeg", "jpg", "gif":
 		return true
 	default:
 		return false
