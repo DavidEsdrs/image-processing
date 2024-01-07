@@ -76,7 +76,7 @@ func (config *Config) ParseConfig(logger logger.Logger, inputImg image.Image) (*
 	config.OutputFormat = format[len(format)-1]
 
 	if config.NearestNeighbor {
-		if config.Width < 0 || config.Height < 0 {
+		if config.Width < 0 || config.Height < 0 || config.Width > 7680 || config.Height > 4320 {
 			return nil, fmt.Errorf("invalid scale factor to nearest neighbor")
 		}
 
