@@ -99,8 +99,8 @@ func processImage(img image.Image, outputPath string, proc *processor.Invoker, l
 	}
 
 	logger.LogProcessf("Saving image as %v", outputPath)
-	config.Save(cImg, outputPath)
-	return nil
+	err = config.Save(cImg, outputPath)
+	return err
 }
 
 // set cli flags

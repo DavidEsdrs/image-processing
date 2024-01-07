@@ -76,7 +76,7 @@ func (config *Config) ParseConfig(logger logger.Logger, inputImg image.Image) (*
 	config.OutputFormat = format[len(format)-1]
 
 	if config.NearestNeighbor {
-		if config.Width < 0 || config.Height < 0 {
+		if config.Width < 0 || config.Height < 0 || config.Width > 7680 || config.Height > 4320 {
 			return nil, fmt.Errorf("invalid scale factor to nearest neighbor")
 		}
 
@@ -139,7 +139,7 @@ func (config *Config) ParseConfig(logger logger.Logger, inputImg image.Image) (*
 			return nil, err
 		}
 
-		f, err := filters.NewOverlayFilter(logger, overlay, inputImg, config.DistTop, config.DistRight, config.DistLeft, config.DistBottom, config.Fill)
+		f, err := filters.NewOverlayFilter(logger, overlay, inputImg, config.DistTop, config.DistRight, config.DistLeft, config.DistBottom)
 
 		if err != nil {
 			return nil, err
