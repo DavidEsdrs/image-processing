@@ -4,9 +4,13 @@ import (
 	"image"
 	"image/gif"
 	"os"
+
+	"github.com/DavidEsdrs/image-processing/logger"
 )
 
-type GifParsingStrategy struct{}
+type GifParsingStrategy struct {
+	logger *logger.Logger
+}
 
 func (jps *GifParsingStrategy) Save(img image.Image, outputPath string) error {
 	fg, err := os.Create(outputPath)
