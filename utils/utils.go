@@ -123,3 +123,31 @@ func ConvertIntoTensor(img image.Image) [][]color.Color {
 
 	return pixels
 }
+
+func GaussianKernel(size int, sigma float64) [][]float64 {
+	if size%2 == 0 {
+		size++
+	}
+
+	kernel := make([][]float64, size)
+	center := size / 2
+	sum := 0.0
+
+	for i := 0; i < size; i++ {
+		kernel[i] = make([]float64, size)
+		for j := 0; j < size; j++ {
+			x := float64(j - center)
+			y := float64(i - center)
+			kernel[i][j] = math.Exp(-(x*x+y*y)/(2*sigma*sigma)) / (2 * math.Pi * sigma * sigma)
+			sum += kernel[i][j]
+		}
+	}
+
+	for i := 0; i < size; i++ {
+		for j := 0; j < size; j++ {
+			kernel[i][j] /= sum
+		}
+	}
+
+	return kernel
+}
