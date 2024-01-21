@@ -19,7 +19,7 @@ This project is intended to offer a set of basic features on image processing. I
   - [ ] Bilinear interpolation
   - [ ] Bicubic interpolation
 - [X] Overlay
-- [ ] Blur
+- [X] Blur
 - [ ] Sharpen
 - [ ] Saturation
 - [ ] Brightness
@@ -115,6 +115,16 @@ Representing xend and ysend.
 ```sh
 iproc -i [input] -o [output] -gs
 ```
+
+- Blur (Gaussian):
+
+```sh
+iproc -i [input] -o [output] -b 7 -s 3
+```
+
+**note**: the `b` flag indicates the size of the kernel that will be used for 
+process the image. While the `s` flag indicates the `sigma` for the gaussian blur
+kernel computation, it's optional.
 
 - Overlay (put image onto another):
 
