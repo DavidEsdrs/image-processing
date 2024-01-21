@@ -45,7 +45,12 @@ func (bf BlurFilter) Execute(tensor *[][]color.Color) error {
 	return nil
 }
 
-func (bf *BlurFilter) getValuesForPixel(tensor *[][]color.Color, copy *[][]color.Color, startX, startY int) (r, g, b uint8) {
+func (bf *BlurFilter) getValuesForPixel(
+	tensor *[][]color.Color,
+	copy *[][]color.Color,
+	startX,
+	startY int,
+) (r, g, b uint8) {
 	height := len(*tensor)
 	width := len((*tensor)[0])
 
