@@ -124,6 +124,7 @@ func ConvertIntoTensor(img image.Image) [][]color.Color {
 	return pixels
 }
 
+// Creates a gaussian kernel of the given size, using the given sigma
 func GaussianKernel(size int, sigma float64) [][]float64 {
 	if size%2 == 0 {
 		size++
