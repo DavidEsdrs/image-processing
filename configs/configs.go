@@ -28,6 +28,8 @@ type Config struct {
 	TurnRight bool
 	Crop      string
 	Overlay   string
+	BlurSize  int
+	Sigma     float64
 
 	// Resize
 	NearestNeighbor bool
@@ -180,6 +182,11 @@ func (config *Config) ParseConfig(logger logger.Logger, inputImg image.Image) (*
 	if config.TurnRight {
 		logger.LogProcess("Turning image right - 90 degrees")
 		f := filters.NewTurnRightFilter()
+		invoker.AddProcess(f)
+	}
+	if config.BlurSize > 0 {
+		logger.LogProcess("Adding blur")
+		f, _ := filters.NewBlurFilter(logger, config.Sigma, config.BlurSize)
 		invoker.AddProcess(f)
 	}
 
