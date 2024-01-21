@@ -54,9 +54,11 @@ func (bf *BlurFilter) getValuesForPixel(
 	height := len(*tensor)
 	width := len((*tensor)[0])
 
-	var rnew uint8
-	var gnew uint8
-	var bnew uint8
+	var (
+		rnew uint8
+		gnew uint8
+		bnew uint8
+	)
 
 	for y := startY; y < startY+bf.kernelSize && y < height; y++ {
 		for x := startX; x < startX+bf.kernelSize && x < width; x++ {
