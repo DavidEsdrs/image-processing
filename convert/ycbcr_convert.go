@@ -17,7 +17,7 @@ func (pstr *YcbcrStrategy) Convert(pixels [][]color.Color) image.Image {
 	for y := 0; y < len(pixels); y++ {
 		for x := 0; x < len(pixels[0]); x++ {
 			p := pixels[y][x]
-			ycbcrColor, ok := p.(color.YCbCr)
+			ycbcrColor, ok := color.YCbCrModel.Convert(p).(color.YCbCr)
 			if ok {
 				yoffset := nImg.YOffset(x, y)
 				coffset := nImg.COffset(x, y)
