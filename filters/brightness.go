@@ -6,10 +6,10 @@ import (
 )
 
 type BrightnessFilter struct {
-	luminance float64
+	luminance int
 }
 
-func NewBrightnessFilter(luminance float64) BrightnessFilter {
+func NewBrightnessFilter(luminance int) BrightnessFilter {
 	return BrightnessFilter{luminance}
 }
 
@@ -28,9 +28,9 @@ func (bf BrightnessFilter) Execute(tensor *[][]color.Color) error {
 			bAsUint8 := b >> 8
 			A := uint8(a >> 8)
 
-			newR := truncate(float64(rAsUint8), bf.luminance)
-			newG := truncate(float64(gAsUint8), bf.luminance)
-			newB := truncate(float64(bAsUint8), bf.luminance)
+			newR := truncate(int(rAsUint8), bf.luminance)
+			newG := truncate(int(gAsUint8), bf.luminance)
+			newB := truncate(int(bAsUint8), bf.luminance)
 
 			newPixel := color.RGBA{
 				R: uint8(newR),
@@ -45,7 +45,7 @@ func (bf BrightnessFilter) Execute(tensor *[][]color.Color) error {
 	return nil
 }
 
-func truncate(x, y float64) uint8 {
+func truncate(x, y int) uint8 {
 	result := x + y
 	if result > math.MaxUint8 {
 		return math.MaxUint8
