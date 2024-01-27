@@ -40,6 +40,7 @@ func (hsl HSL) RGBA() (r, g, b, a uint32) {
 		r = uint32(0xffff * hsl.L)
 		g = uint32(0xffff * hsl.L)
 		b = uint32(0xffff * hsl.L)
+		a = 0xffff
 		return
 	}
 
