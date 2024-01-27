@@ -31,6 +31,7 @@ type Config struct {
 	BlurSize   int
 	Sigma      float64
 	Brightness int
+	Saturation int
 
 	// Resize
 	NearestNeighbor bool
@@ -190,9 +191,14 @@ func (config *Config) ParseConfig(logger logger.Logger, inputImg image.Image) (*
 		f, _ := filters.NewBlurFilter(logger, config.Sigma, config.BlurSize)
 		invoker.AddProcess(f)
 	}
-	if config.Brightness != 1.0 {
+	if config.Brightness != 0 {
 		logger.LogProcess("Adjusting brightness")
 		f := filters.NewBrightnessFilter(config.Brightness)
+		invoker.AddProcess(f)
+	}
+	if config.Saturation != 0 {
+		logger.LogProcess("Adjusting saturation")
+		f := filters.NewSaturationFilter(config.Saturation)
 		invoker.AddProcess(f)
 	}
 
