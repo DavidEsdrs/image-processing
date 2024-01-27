@@ -75,7 +75,7 @@ func processImage(img image.Image, outputPath string, proc *processor.Invoker, l
 	tensor := utils.ConvertIntoTensor(img)
 
 	logger.LogProcess("Start invoking filters")
-	iep, err := proc.Invoke(&tensor)
+	err := proc.Invoke(&tensor)
 
 	if err != nil {
 		return err
@@ -90,7 +90,7 @@ func processImage(img image.Image, outputPath string, proc *processor.Invoker, l
 	}
 
 	logger.LogProcess("Converting tensor back into image")
-	cImg := conversor.Convert(*iep)
+	cImg := conversor.Convert(tensor)
 
 	pc := parsing.NewParsingContext(logger)
 
