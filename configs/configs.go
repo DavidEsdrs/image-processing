@@ -18,18 +18,19 @@ var ErrWrongArgsCountForCropping = fmt.Errorf("wrong arguments count for croppin
 
 type Config struct {
 	// Filters
-	Input     string
-	Output    string
-	FlipY     bool
-	FlipX     bool
-	Transpose bool
-	Grayscale bool
-	TurnLeft  bool
-	TurnRight bool
-	Crop      string
-	Overlay   string
-	BlurSize  int
-	Sigma     float64
+	Input      string
+	Output     string
+	FlipY      bool
+	FlipX      bool
+	Transpose  bool
+	Grayscale  bool
+	TurnLeft   bool
+	TurnRight  bool
+	Crop       string
+	Overlay    string
+	BlurSize   int
+	Sigma      float64
+	Brightness float64
 
 	// Resize
 	NearestNeighbor bool
@@ -187,6 +188,11 @@ func (config *Config) ParseConfig(logger logger.Logger, inputImg image.Image) (*
 	if config.BlurSize > 0 {
 		logger.LogProcess("Adding blur")
 		f, _ := filters.NewBlurFilter(logger, config.Sigma, config.BlurSize)
+		invoker.AddProcess(f)
+	}
+	if config.Brightness != 1.0 {
+		logger.LogProcess("Adjusting brightness")
+		f := filters.NewBrightnessFilter(config.Brightness)
 		invoker.AddProcess(f)
 	}
 
