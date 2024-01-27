@@ -30,7 +30,7 @@ type Config struct {
 	Overlay    string
 	BlurSize   int
 	Sigma      float64
-	Brightness float64
+	Brightness int
 
 	// Resize
 	NearestNeighbor bool
