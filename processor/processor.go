@@ -35,6 +35,6 @@ func (i *Invoker) AddProcess(c Command) {
 	i.FiltersApplied++
 }
 
-func (i *Invoker) MustInvoke() bool {
+func (i *Invoker) ShouldInvoke() bool {
 	return i.FiltersApplied > 0
 }
