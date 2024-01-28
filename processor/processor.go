@@ -1,6 +1,8 @@
 package processor
 
-import "image/color"
+import (
+	"image/color"
+)
 
 type Command interface {
 	Execute(*[][]color.Color) error
