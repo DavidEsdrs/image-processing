@@ -16,6 +16,9 @@ type BlurFilter struct {
 
 func NewBlurFilter(l logger.Logger, sigma float64, kernelSize int) (BlurFilter, error) {
 	kernel := utils.GaussianKernel(kernelSize, sigma)
+	if sigma == 1 {
+		sigma = float64(kernelSize) / 2
+	}
 	bf := BlurFilter{l: l, sigma: sigma, kernelSize: kernelSize, kernel: kernel}
 	return bf, nil
 }
