@@ -7,8 +7,9 @@ type Command interface {
 }
 
 type Invoker struct {
-	processes  []Command
-	ColorModel color.Model
+	processes      []Command
+	ColorModel     color.Model
+	FiltersApplied int
 }
 
 func (i *Invoker) Invoke(tensor *[][]color.Color) error {
@@ -31,4 +32,9 @@ func (i *Invoker) SetColorModel(colorModel color.Model) {
 
 func (i *Invoker) AddProcess(c Command) {
 	i.processes = append(i.processes, c)
+	i.FiltersApplied++
+}
+
+func (i *Invoker) MustInvoke() bool {
+	return i.FiltersApplied > 0
 }
