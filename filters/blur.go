@@ -27,10 +27,7 @@ func (bf BlurFilter) Execute(tensor *[][]color.Color) error {
 	height := len(*tensor)
 	width := len((*tensor)[0])
 
-	copy := make([][]color.Color, height)
-	for i := range copy {
-		copy[i] = append(copy[i], (*tensor)[i]...)
-	}
+	copy := deepCopy(tensor)
 
 	for y := 0; y < height; y++ {
 		for x := 0; x < width; x++ {
@@ -48,13 +45,29 @@ func (bf BlurFilter) Execute(tensor *[][]color.Color) error {
 	return nil
 }
 
-func (bf *BlurFilter) getValuesForPixel(tensor *[][]color.Color, copy *[][]color.Color, startX, startY int) (r, g, b uint8) {
+// produces a deep copy from src to dst
+func deepCopy(src *[][]color.Color) (copy [][]color.Color) {
+	copy = make([][]color.Color, len(*src))
+	for i := range copy {
+		copy[i] = append(copy[i], (*src)[i]...)
+	}
+	return
+}
+
+func (bf *BlurFilter) getValuesForPixel(
+	tensor *[][]color.Color,
+	copy *[][]color.Color,
+	startX,
+	startY int,
+) (r, g, b uint8) {
 	height := len(*tensor)
 	width := len((*tensor)[0])
 
-	var rnew uint8
-	var gnew uint8
-	var bnew uint8
+	var (
+		rnew uint8
+		gnew uint8
+		bnew uint8
+	)
 
 	sy := fixed(startY - (bf.kernelSize / 2))
 	sx := fixed(startX - (bf.kernelSize / 2))

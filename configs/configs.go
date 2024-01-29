@@ -15,21 +15,24 @@ import (
 var ErrInvalidOutputFormat = fmt.Errorf("invalid output format")
 var ErrInvalidScaleFactor = fmt.Errorf("invalid scale factor")
 var ErrWrongArgsCountForCropping = fmt.Errorf("wrong arguments count for cropping")
+var ErrNoEffectAppliedNorContainer = fmt.Errorf("no effect applied nor container changed")
 
 type Config struct {
 	// Filters
-	Input     string
-	Output    string
-	FlipY     bool
-	FlipX     bool
-	Transpose bool
-	Grayscale bool
-	TurnLeft  bool
-	TurnRight bool
-	Crop      string
-	Overlay   string
-	BlurSize  int
-	Sigma     float64
+	Input      string
+	Output     string
+	FlipY      bool
+	FlipX      bool
+	Transpose  bool
+	Grayscale  bool
+	TurnLeft   bool
+	TurnRight  bool
+	Crop       string
+	Overlay    string
+	BlurSize   int
+	Sigma      float64
+	Brightness int
+	Saturation int
 
 	// Resize
 	NearestNeighbor bool
@@ -45,6 +48,7 @@ type Config struct {
 	Quality int
 
 	OutputFormat string
+	InputFormat  string
 
 	// Overlay
 	DistTop    int
@@ -73,13 +77,17 @@ func GetConfig() *Config {
 func (config *Config) ParseConfig(logger logger.Logger, inputImg image.Image) (*processor.Invoker, error) {
 	invoker := processor.Invoker{}
 
-	format := strings.Split(config.Output, ".")
+	outputFormat := strings.Split(config.Output, ".")
 
-	if len(format) <= 1 {
+	if len(outputFormat) <= 1 {
 		return nil, ErrInvalidOutputFormat
 	}
 
-	config.OutputFormat = format[len(format)-1]
+	config.OutputFormat = outputFormat[len(outputFormat)-1]
+
+	inputFormat := strings.Split(config.Output, ".")
+
+	config.InputFormat = inputFormat[len(inputFormat)-1]
 
 	if !isValidImageType(config.OutputFormat) {
 		return nil, ErrInvalidOutputFormat
@@ -188,6 +196,19 @@ func (config *Config) ParseConfig(logger logger.Logger, inputImg image.Image) (*
 		logger.LogProcess("Adding blur")
 		f, _ := filters.NewBlurFilter(logger, config.Sigma, config.BlurSize)
 		invoker.AddProcess(f)
+	}
+	if config.Brightness != 1.0 {
+		logger.LogProcess("Adjusting brightness")
+		f := filters.NewBrightnessFilter(config.Brightness)
+		invoker.AddProcess(f)
+	}
+	if config.Saturation != 0 {
+		logger.LogProcess("Adjusting saturation")
+		f := filters.NewSaturationFilter(config.Saturation)
+		invoker.AddProcess(f)
+	}
+	if !invoker.ShouldInvoke() && config.InputFormat == config.OutputFormat {
+		return nil, ErrNoEffectAppliedNorContainer
 	}
 
 	return &invoker, nil

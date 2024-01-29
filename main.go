@@ -74,7 +74,8 @@ func processImage(img image.Image, outputPath string, proc *processor.Invoker, l
 	logger.LogProcess("Converting image into tensor")
 	tensor := utils.ConvertIntoTensor(img)
 
-	iep, err := proc.Invoke(&tensor)
+	logger.LogProcess("Start invoking filters")
+	err := proc.Invoke(&tensor)
 
 	if err != nil {
 		return err
@@ -88,7 +89,8 @@ func processImage(img image.Image, outputPath string, proc *processor.Invoker, l
 		return err
 	}
 
-	cImg := conversor.Convert(*iep)
+	logger.LogProcess("Converting tensor back into image")
+	cImg := conversor.Convert(tensor)
 
 	pc := parsing.NewParsingContext(logger)
 
@@ -125,6 +127,8 @@ func setFlags(config *configs.Config, verbose *bool, help *bool) {
 	flag.IntVar(&config.Quality, "q", 0, "Quality of the JPEG image. 1-100")
 	flag.IntVar(&config.BlurSize, "b", 0, "How blurry the image will be")
 	flag.Float64Var(&config.Sigma, "s", 1.0, "Sigma value for blur")
+	flag.IntVar(&config.Brightness, "l", 1.0, "Brightness value")
+	flag.IntVar(&config.Saturation, "sat", 0, "Saturation value")
 
 	// Resize
 	flag.BoolVar(&config.NearestNeighbor, "nn", false, "Apply nearest neighbor resize algorithm")

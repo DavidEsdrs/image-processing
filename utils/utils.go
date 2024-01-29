@@ -68,7 +68,7 @@ func CreateBicubicKernel(size int) [][]float64 {
 	return kernel
 }
 
-func Max(a, b, c uint32) uint32 {
+func Max[T Number](a, b, c T) T {
 	if a > b {
 		if a > c {
 			return a
@@ -81,7 +81,7 @@ func Max(a, b, c uint32) uint32 {
 	return c
 }
 
-func Min(a, b, c uint32) uint32 {
+func Min[T Number](a, b, c T) T {
 	if a < b {
 		if a < c {
 			return a
@@ -124,6 +124,7 @@ func ConvertIntoTensor(img image.Image) [][]color.Color {
 	return pixels
 }
 
+// Creates a gaussian kernel of the given size, using the given sigma
 func GaussianKernel(size int, sigma float64) [][]float64 {
 	if size%2 == 0 {
 		size++
