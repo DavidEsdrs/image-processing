@@ -69,15 +69,21 @@ func (bf *BlurFilter) getValuesForPixel(
 		bnew uint8
 	)
 
-	for y := startY; y < startY+bf.kernelSize && y < height; y++ {
-		for x := startX; x < startX+bf.kernelSize && x < width; x++ {
+	sy := fixed(startY - (bf.kernelSize / 2))
+	sx := fixed(startX - (bf.kernelSize / 2))
+
+	endY := fixed(startY + (bf.kernelSize / 2))
+	endX := fixed(startX + (bf.kernelSize / 2))
+
+	for y := sy; y <= endY && y < height; y++ {
+		for x := sx; x <= endX && x < width; x++ {
 			r, g, b, _ := (*copy)[y][x].RGBA()
 
 			rc := uint8(r >> 8)
 			gc := uint8(g >> 8)
 			bc := uint8(b >> 8)
 
-			w := bf.kernel[y-startY][x-startX]
+			w := bf.kernel[y-sy][x-sx]
 
 			convertedR := float64(rc) * w
 			convertedG := float64(gc) * w
@@ -90,4 +96,11 @@ func (bf *BlurFilter) getValuesForPixel(
 	}
 
 	return rnew, gnew, bnew
+}
+
+func fixed(x int) int {
+	if x < 0 {
+		return 0
+	}
+	return x
 }
