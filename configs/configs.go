@@ -85,7 +85,7 @@ func (config *Config) ParseConfig(logger logger.Logger, inputImg image.Image) (*
 
 	config.OutputFormat = outputFormat[len(outputFormat)-1]
 
-	inputFormat := strings.Split(config.Output, ".")
+	inputFormat := strings.Split(config.Input, ".")
 
 	config.InputFormat = inputFormat[len(inputFormat)-1]
 
