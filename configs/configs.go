@@ -94,15 +94,13 @@ func (config *Config) ParseConfig(logger logger.Logger, inputImg image.Image) (*
 	}
 
 	if config.NearestNeighbor {
-		if config.Width < 0 || config.Height < 0 || config.Width > 7680 || config.Height > 4320 {
+		if config.Factor != 1 {
+			logger.LogProcessf("Resizing image to scale %v - nearest neighbor algorithm\n", config.Factor)
+		} else if config.Width < 0 || config.Height < 0 || config.Width > 7680 || config.Height > 4320 {
 			return nil, ErrInvalidScaleFactor
 		}
 
-		if config.Factor != 1 {
-			logger.LogProcessf("Resizing image to scale %v - nearest neighbor algorithm\n", config.Factor)
-		} else {
-			logger.LogProcessf("Resizing image to dimensions %vx%v - nearest neighbor algorithm\n", config.Width, config.Height)
-		}
+		logger.LogProcessf("Resizing image to dimensions %vx%v - nearest neighbor algorithm\n", config.Width, config.Height)
 
 		f := filters.NewNearestNeighborFilter(config.Factor, config.Width, config.Height)
 
