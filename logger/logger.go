@@ -37,6 +37,9 @@ Image Processing Options:
 	-db int          (overlay) Distance to the bottom
 	-dl int          (overlay) Distance to the left
 	-dr int          (overlay) Distance to the right
+	-l  int          Brightness value. It will be added to each channel for each pixel.
+	-b  int          How blurry the image will be. It is the size of the kernel that will be applied.
+	-s  int          Sigma value for blur algorithm. It is optional. When not given, it will be half the value of b flag for better result.
 `
 
 type Logger struct {
