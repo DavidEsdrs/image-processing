@@ -2,6 +2,8 @@ package filters
 
 import (
 	"image/color"
+	"sync"
+	"time"
 
 	"github.com/DavidEsdrs/image-processing/logger"
 	"github.com/DavidEsdrs/image-processing/utils"
@@ -24,23 +26,38 @@ func NewBlurFilter(l logger.Logger, sigma float64, kernelSize int) (BlurFilter, 
 }
 
 func (bf BlurFilter) Execute(tensor *[][]color.Color) error {
+	start := time.Now()
+
 	height := len(*tensor)
 	width := len((*tensor)[0])
 
 	copy := deepCopy(tensor)
 
-	for y := 0; y < height; y++ {
-		for x := 0; x < width; x++ {
-			_, _, _, a := (*tensor)[y][x].RGBA()
-			r, g, b := bf.getValuesForPixel(tensor, &copy, x, y)
-			(*tensor)[y][x] = color.RGBA{
-				R: r,
-				G: g,
-				B: b,
-				A: uint8(a >> 8),
-			}
+	var wg sync.WaitGroup
+
+	process := func(x, y int) {
+		defer wg.Done()
+		_, _, _, a := (*tensor)[y][x].RGBA()
+		r, g, b := bf.getValuesForPixel(tensor, &copy, x, y)
+		(*tensor)[y][x] = color.RGBA{
+			R: r,
+			G: g,
+			B: b,
+			A: uint8(a >> 8),
 		}
 	}
+
+	for y := 0; y < height; y++ {
+		for x := 0; x < width; x++ {
+			wg.Add(1)
+			go process(x, y)
+		}
+	}
+
+	wg.Wait()
+
+	duration := time.Since(start)
+	bf.l.LogProcessf("it took %vms to process the blur", duration.Milliseconds())
 
 	return nil
 }
