@@ -22,7 +22,7 @@ This project is intended to offer a set of basic features on image processing. I
 - [X] Blur
 - [ ] Sharpen
 - [ ] Saturation
-- [ ] Brightness
+- [X] Brightness
 
 ## Dev requirements 🔎
 
