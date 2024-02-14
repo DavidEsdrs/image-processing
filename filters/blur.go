@@ -3,7 +3,6 @@ package filters
 import (
 	"image/color"
 	"sync"
-	"time"
 
 	"github.com/DavidEsdrs/image-processing/logger"
 	"github.com/DavidEsdrs/image-processing/utils"
@@ -26,19 +25,18 @@ func NewBlurFilter(l logger.Logger, sigma float64, kernelSize int) (BlurFilter, 
 }
 
 func (bf BlurFilter) Execute(tensor *[][]color.Color) error {
-	start := time.Now()
-
 	height := len(*tensor)
 	width := len((*tensor)[0])
 
-	copy := deepCopy(tensor)
+	copy := new([][]color.Color)
+	deepCopy(tensor, copy)
 
 	var wg sync.WaitGroup
 
 	process := func(x, y int) {
 		defer wg.Done()
 		_, _, _, a := (*tensor)[y][x].RGBA()
-		r, g, b := bf.getValuesForPixel(tensor, &copy, x, y)
+		r, g, b := bf.getValuesForPixel(tensor, copy, x, y)
 		(*tensor)[y][x] = color.RGBA{
 			R: r,
 			G: g,
@@ -56,22 +54,18 @@ func (bf BlurFilter) Execute(tensor *[][]color.Color) error {
 
 	wg.Wait()
 
-	duration := time.Since(start)
-	bf.l.LogProcessf("it took %vms to process the blur", duration.Milliseconds())
-
 	return nil
 }
 
 // produces a deep copy from src to dst
-func deepCopy(src *[][]color.Color) (copy [][]color.Color) {
-	copy = make([][]color.Color, len(*src))
-	for i := range copy {
-		copy[i] = append(copy[i], (*src)[i]...)
+func deepCopy(src *[][]color.Color, copy *[][]color.Color) {
+	*copy = make([][]color.Color, len(*src))
+	for i := range *copy {
+		(*copy)[i] = append((*copy)[i], (*src)[i]...)
 	}
-	return
 }
 
-func (bf *BlurFilter) getValuesForPixel(
+func (bf BlurFilter) getValuesForPixel(
 	tensor *[][]color.Color,
 	copy *[][]color.Color,
 	startX,
