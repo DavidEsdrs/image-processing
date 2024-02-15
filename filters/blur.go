@@ -90,19 +90,19 @@ func (bf BlurFilter) getValuesForPixel(
 		for x := sx; x <= endX && x < width; x++ {
 			r, g, b, _ := (*copy)[y][x].RGBA()
 
-			rc := uint8(r >> 8)
-			gc := uint8(g >> 8)
-			bc := uint8(b >> 8)
-
 			w := bf.kernel[y-sy][x-sx]
 
-			convertedR := float64(rc) * w
-			convertedG := float64(gc) * w
-			convertedB := float64(bc) * w
+			convertedR := float64(r) * w
+			convertedG := float64(g) * w
+			convertedB := float64(b) * w
 
-			rnew += uint8(convertedR)
-			gnew += uint8(convertedG)
-			bnew += uint8(convertedB)
+			R := uint32(convertedR) >> 8
+			G := uint32(convertedG) >> 8
+			B := uint32(convertedB) >> 8
+
+			rnew += uint8(R)
+			gnew += uint8(G)
+			bnew += uint8(B)
 		}
 	}
 
