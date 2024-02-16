@@ -59,7 +59,7 @@ iproc -i [input] -o [output] -fy
 iproc -i [input] -o [output] -fx
 ```
 
-- Rotate (actually, it is a transpose, a rotation 270 degrees + flip in Y axis, it will be changed!!!)
+- Transpose (a rotation 270 degrees + flip in Y axis, it will be changed!!!)
 
 ```sh
 iproc -i [input] -o [output] -t
@@ -170,3 +170,7 @@ before:
 after:
 
 ![lunch after effects](./assets/almoço.png)
+
+## Known issues
+
+- [ ] When applied, blur let image darker
