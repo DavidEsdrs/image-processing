@@ -28,8 +28,8 @@ func (bf BlurFilter) Execute(tensor *[][]color.Color) error {
 	height := len(*tensor)
 	width := len((*tensor)[0])
 
-	copy := new([][]color.Color)
-	deepCopy(tensor, copy)
+	paddingSize := bf.kernelSize / 2
+	copy := padImage(tensor, paddingSize)
 
 	var wg sync.WaitGroup
 
@@ -45,10 +45,10 @@ func (bf BlurFilter) Execute(tensor *[][]color.Color) error {
 		}
 	}
 
-	for y := 0; y < height; y++ {
-		for x := 0; x < width; x++ {
+	for y := paddingSize; y < height+paddingSize; y++ {
+		for x := paddingSize; x < width+paddingSize; x++ {
 			wg.Add(1)
-			go process(x, y)
+			go process(x-paddingSize, y-paddingSize)
 		}
 	}
 
@@ -57,12 +57,58 @@ func (bf BlurFilter) Execute(tensor *[][]color.Color) error {
 	return nil
 }
 
-// produces a deep copy from src to dst
-func deepCopy(src *[][]color.Color, copy *[][]color.Color) {
-	*copy = make([][]color.Color, len(*src))
-	for i := range *copy {
-		(*copy)[i] = append((*copy)[i], (*src)[i]...)
+func padImage(img *[][]color.Color, paddingSize int) *[][]color.Color {
+	width := len((*img)[0])
+	targetWidth := len((*img)[0]) + paddingSize*2
+
+	height := len(*img)
+	targetHeight := len(*img) + paddingSize*2
+
+	output := make([][]color.Color, height)
+
+	for y := 0; y < height; y++ {
+		output[y] = make([]color.Color, targetWidth)
 	}
+
+	padHorizontal := func() {
+		for y := 0; y < height; y++ {
+			firstPixel := (*img)[y][0]
+			lastPixel := (*img)[y][width-1]
+
+			for x := 0; x < targetWidth; x++ {
+				if x > paddingSize && x < targetWidth-paddingSize {
+					output[y][x] = (*img)[y][x-paddingSize]
+				} else if x < paddingSize {
+					output[y][x] = firstPixel
+				} else {
+					output[y][x] = lastPixel
+				}
+			}
+		}
+	}
+
+	padHorizontal()
+
+	padVertical := func() *[][]color.Color {
+		newOutput := make([][]color.Color, targetHeight)
+
+		firstLine := output[0]
+		lastLine := output[height-1]
+
+		for y := 0; y < targetHeight; y++ {
+			if y > paddingSize && y < targetHeight-paddingSize {
+				newOutput[y] = output[y-paddingSize]
+			} else if y < paddingSize {
+				newOutput[y] = firstLine
+			} else {
+				newOutput[y] = lastLine
+			}
+		}
+
+		return &newOutput
+	}
+
+	return padVertical()
 }
 
 func (bf BlurFilter) getValuesForPixel(
@@ -88,17 +134,17 @@ func (bf BlurFilter) getValuesForPixel(
 
 	for y := sy; y <= endY && y < height; y++ {
 		for x := sx; x <= endX && x < width; x++ {
-			r, g, b, _ := (*copy)[y][x].RGBA()
+			weight := bf.kernel[y-sy][x-sx]
 
-			w := bf.kernel[y-sy][x-sx]
+			r, g, b, _ := (*copy)[y][x].RGBA() // está correto?
 
-			convertedR := float64(r) * w
-			convertedG := float64(g) * w
-			convertedB := float64(b) * w
+			y, cb, cr := color.RGBToYCbCr(uint8(r>>8), uint8(g>>8), uint8(b>>8))
 
-			R := uint32(convertedR) >> 8
-			G := uint32(convertedG) >> 8
-			B := uint32(convertedB) >> 8
+			y = uint8(float64(y) * weight)
+			cb = uint8(float64(cb) * weight)
+			cr = uint8(float64(cr) * weight)
+
+			R, G, B := color.YCbCrToRGB(y, cb, cr)
 
 			rnew += uint8(R)
 			gnew += uint8(G)
