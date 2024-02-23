@@ -14,6 +14,8 @@ type Invoker struct {
 	FiltersApplied int
 }
 
+// Invoke invokes all the commands (processes, filters or transformations) and
+// applies it to the given tensor, which represents the input image.
 func (i *Invoker) Invoke(tensor *[][]color.Color) error {
 	for _, p := range i.processes {
 		err := p.Execute(tensor)

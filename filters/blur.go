@@ -35,13 +35,24 @@ func (bf BlurFilter) Execute(tensor *[][]color.Color) error {
 
 	process := func(x, y int) {
 		defer wg.Done()
-		_, _, _, a := (*tensor)[y][x].RGBA()
-		r, g, b := bf.getValuesForPixel(tensor, copy, x, y)
+		r, g, b, a := bf.getValuesForPixel(tensor, copy, x, y)
 		(*tensor)[y][x] = color.RGBA{
-			R: r,
-			G: g,
-			B: b,
+			R: uint8(r >> 8),
+			G: uint8(g >> 8),
+			B: uint8(b >> 8),
 			A: uint8(a >> 8),
+		}
+	}
+
+	for y := 0; y < height; y++ {
+		for x := 0; x < width; x++ {
+			r, g, b, a := bf.getValuesForPixel(tensor, copy, x, y)
+			(*tensor)[y][x] = color.RGBA{
+				R: uint8(r >> 8),
+				G: uint8(g >> 8),
+				B: uint8(b >> 8),
+				A: uint8(a >> 8),
+			}
 		}
 	}
 
@@ -116,14 +127,15 @@ func (bf BlurFilter) getValuesForPixel(
 	copy *[][]color.Color,
 	startX,
 	startY int,
-) (r, g, b uint8) {
+) (r, g, b, a uint32) {
 	height := len(*tensor)
 	width := len((*tensor)[0])
 
 	var (
-		rnew uint8
-		gnew uint8
-		bnew uint8
+		rnew uint32
+		gnew uint32
+		bnew uint32
+		anew uint32
 	)
 
 	sy := fixed(startY - (bf.kernelSize / 2))
@@ -134,25 +146,22 @@ func (bf BlurFilter) getValuesForPixel(
 
 	for y := sy; y <= endY && y < height; y++ {
 		for x := sx; x <= endX && x < width; x++ {
-			weight := bf.kernel[y-sy][x-sx]
+			w := bf.kernel[y-sy][x-sx]
+			r, g, b, a := (*copy)[y][x].RGBA()
 
-			r, g, b, _ := (*copy)[y][x].RGBA() // está correto?
+			convertedR := float64(r) * w
+			convertedG := float64(g) * w
+			convertedB := float64(b) * w
+			convertedA := float64(a) * w
 
-			y, cb, cr := color.RGBToYCbCr(uint8(r>>8), uint8(g>>8), uint8(b>>8))
-
-			y = uint8(float64(y) * weight)
-			cb = uint8(float64(cb) * weight)
-			cr = uint8(float64(cr) * weight)
-
-			R, G, B := color.YCbCrToRGB(y, cb, cr)
-
-			rnew += uint8(R)
-			gnew += uint8(G)
-			bnew += uint8(B)
+			rnew += uint32(convertedR)
+			gnew += uint32(convertedG)
+			bnew += uint32(convertedB)
+			anew += uint32(convertedA)
 		}
 	}
 
-	return rnew, gnew, bnew
+	return rnew, gnew, bnew, anew
 }
 
 func fixed(x int) int {
