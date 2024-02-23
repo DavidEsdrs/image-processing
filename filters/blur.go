@@ -44,18 +44,6 @@ func (bf BlurFilter) Execute(tensor *[][]color.Color) error {
 		}
 	}
 
-	for y := 0; y < height; y++ {
-		for x := 0; x < width; x++ {
-			r, g, b, a := bf.getValuesForPixel(tensor, copy, x, y)
-			(*tensor)[y][x] = color.RGBA{
-				R: uint8(r >> 8),
-				G: uint8(g >> 8),
-				B: uint8(b >> 8),
-				A: uint8(a >> 8),
-			}
-		}
-	}
-
 	for y := paddingSize; y < height+paddingSize; y++ {
 		for x := paddingSize; x < width+paddingSize; x++ {
 			wg.Add(1)
