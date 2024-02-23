@@ -31,13 +31,12 @@ func (bf BlurFilter) Execute(tensor *[][]color.Color) error {
 
 	for y := 0; y < height; y++ {
 		for x := 0; x < width; x++ {
-			_, _, _, a := (*tensor)[y][x].RGBA()
-			r, g, b := bf.getValuesForPixel(tensor, &copy, x, y)
+			r, g, b, a := bf.getValuesForPixel(tensor, &copy, x, y)
 			(*tensor)[y][x] = color.RGBA{
 				R: r,
 				G: g,
 				B: b,
-				A: uint8(a >> 8),
+				A: a,
 			}
 		}
 	}
@@ -59,7 +58,7 @@ func (bf *BlurFilter) getValuesForPixel(
 	copy *[][]color.Color,
 	startX,
 	startY int,
-) (r, g, b uint8) {
+) (r, g, b, a uint8) {
 	height := len(*tensor)
 	width := len((*tensor)[0])
 
@@ -67,6 +66,7 @@ func (bf *BlurFilter) getValuesForPixel(
 		rnew uint8
 		gnew uint8
 		bnew uint8
+		anew uint8
 	)
 
 	sy := fixed(startY - (bf.kernelSize / 2))
@@ -77,25 +77,23 @@ func (bf *BlurFilter) getValuesForPixel(
 
 	for y := sy; y <= endY && y < height; y++ {
 		for x := sx; x <= endX && x < width; x++ {
-			r, g, b, _ := (*copy)[y][x].RGBA()
-
-			rc := uint8(r >> 8)
-			gc := uint8(g >> 8)
-			bc := uint8(b >> 8)
+			r, g, b, a := (*copy)[y][x].RGBA()
 
 			w := bf.kernel[y-sy][x-sx]
 
-			convertedR := float64(rc) * w
-			convertedG := float64(gc) * w
-			convertedB := float64(bc) * w
+			convertedR := float64(r) * w
+			convertedG := float64(g) * w
+			convertedB := float64(b) * w
+			convertedA := float64(a) * w
 
-			rnew += uint8(convertedR)
-			gnew += uint8(convertedG)
-			bnew += uint8(convertedB)
+			rnew += uint8(uint32(convertedR) >> 8)
+			gnew += uint8(uint32(convertedG) >> 8)
+			bnew += uint8(uint32(convertedB) >> 8)
+			anew += uint8(uint32(convertedA) >> 8)
 		}
 	}
 
-	return rnew, gnew, bnew
+	return rnew, gnew, bnew, anew
 }
 
 func fixed(x int) int {
