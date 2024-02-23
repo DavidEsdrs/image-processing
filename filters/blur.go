@@ -33,10 +33,10 @@ func (bf BlurFilter) Execute(tensor *[][]color.Color) error {
 		for x := 0; x < width; x++ {
 			r, g, b, a := bf.getValuesForPixel(tensor, &copy, x, y)
 			(*tensor)[y][x] = color.RGBA{
-				R: r,
-				G: g,
-				B: b,
-				A: a,
+				R: uint8(r >> 8),
+				G: uint8(g >> 8),
+				B: uint8(b >> 8),
+				A: uint8(a >> 8),
 			}
 		}
 	}
@@ -58,15 +58,15 @@ func (bf *BlurFilter) getValuesForPixel(
 	copy *[][]color.Color,
 	startX,
 	startY int,
-) (r, g, b, a uint8) {
+) (r, g, b, a uint32) {
 	height := len(*tensor)
 	width := len((*tensor)[0])
 
 	var (
-		rnew uint8
-		gnew uint8
-		bnew uint8
-		anew uint8
+		rnew uint32
+		gnew uint32
+		bnew uint32
+		anew uint32
 	)
 
 	sy := fixed(startY - (bf.kernelSize / 2))
@@ -86,10 +86,10 @@ func (bf *BlurFilter) getValuesForPixel(
 			convertedB := float64(b) * w
 			convertedA := float64(a) * w
 
-			rnew += uint8(uint32(convertedR) >> 8)
-			gnew += uint8(uint32(convertedG) >> 8)
-			bnew += uint8(uint32(convertedB) >> 8)
-			anew += uint8(uint32(convertedA) >> 8)
+			rnew += uint32(convertedR)
+			gnew += uint32(convertedG)
+			bnew += uint32(convertedB)
+			anew += uint32(convertedA)
 		}
 	}
 
