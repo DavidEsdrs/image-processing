@@ -69,29 +69,35 @@ func CreateBicubicKernel(size int) [][]float64 {
 }
 
 func Max[T Number](a, b, c T) T {
-	if a > b {
-		if a > c {
-			return a
-		}
-		return c
+	max := a
+	if b > max {
+		max = b
 	}
-	if b > c {
-		return b
+	if c > max {
+		max = c
 	}
-	return c
+	return max
 }
 
 func Min[T Number](a, b, c T) T {
-	if a < b {
-		if a < c {
-			return a
-		}
-		return c
+	min := a
+	if b < min {
+		min = b
 	}
-	if b < c {
-		return b
+	if c < min {
+		min = c
 	}
-	return c
+	return min
+}
+
+// clamp ensures the value stays within the specified range.
+func Clamp(value float64, min, max float64) float64 {
+	if value < min {
+		return min
+	} else if value > max {
+		return max
+	}
+	return value
 }
 
 // Load image file with the given path - return an error and image.Image nil
