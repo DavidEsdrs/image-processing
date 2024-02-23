@@ -32,7 +32,7 @@ type Config struct {
 	BlurSize   int
 	Sigma      float64
 	Brightness int
-	Saturation int
+	Saturation float64
 
 	// Resize
 	NearestNeighbor bool
