@@ -21,7 +21,7 @@ This project is intended to offer a set of basic features on image processing. I
 - [X] Overlay
 - [X] Blur
 - [ ] Sharpen
-- [ ] Saturation
+- [X] Saturation
 - [X] Brightness
 
 ## Dev requirements 🔎
