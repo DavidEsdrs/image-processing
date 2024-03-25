@@ -131,7 +131,7 @@ func (config *Config) ParseConfig(logger logger.Logger, inputImg image.Image) (*
 			return nil, ErrWrongArgsCountForCropping
 		}
 
-		f, err := filters.NewCropFilter(inputImg, xstart, xend, ystart, yend)
+		f, err := filters.NewCropFilter(inputImg, xstart, ystart, xend, yend)
 
 		if err != nil {
 			return nil, err
