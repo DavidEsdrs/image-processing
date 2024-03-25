@@ -173,4 +173,4 @@ after:
 
 ## Known issues
 
-- [ ] When applied, blur let image darker
+- [X] FIXED - When applied, blur let image darker
