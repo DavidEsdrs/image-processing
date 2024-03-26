@@ -150,9 +150,10 @@ You can pass any of the following flags (read the note):
 
 > **More will be added soon** 😄
 
-## Considerations ⚠️
+## Tests
 
-As the project progresses, it will get closer to being a tool and more effects will be added.
+You can run the `test_suite.sh` script to run some commands and check the results.
+They will be in the `output` folder with their respective effect as name.
 
 ## Examples ⭐
 
