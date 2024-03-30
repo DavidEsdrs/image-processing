@@ -15,6 +15,7 @@ import (
 var ErrInvalidOutputFormat = fmt.Errorf("invalid output format")
 var ErrInvalidScaleFactor = fmt.Errorf("invalid scale factor")
 var ErrWrongArgsCountForCropping = fmt.Errorf("wrong arguments count for cropping")
+var ErrInvalidCropPoints = fmt.Errorf("some argument for cropping is wrong")
 var ErrNoEffectAppliedNorContainer = fmt.Errorf("no effect applied nor container changed")
 
 type Config struct {
@@ -120,10 +121,11 @@ func (config *Config) ParseConfig(logger logger.Logger, inputImg image.Image) (*
 		var yend int
 
 		if len(str) == 4 {
-			xstart, _ = strconv.Atoi(str[0])
-			xend, _ = strconv.Atoi(str[1])
-			ystart, _ = strconv.Atoi(str[2])
-			yend, _ = strconv.Atoi(str[3])
+			var err error
+			xstart, xend, ystart, yend, err = parseCropPoints(str[0], str[1], str[2], str[3])
+			if err != nil {
+				return nil, ErrInvalidCropPoints
+			}
 		} else if len(str) == 2 {
 			xend, _ = strconv.Atoi(str[0])
 			yend, _ = strconv.Atoi(str[1])
@@ -244,4 +246,21 @@ func isValidImageType(t string) bool {
 	default:
 		return false
 	}
+}
+
+func parseCropPoints(xStartString, xEndString, yStartString, yEndString string) (xstart, xend, ystart, yend int, err error) {
+	xstart, err = strconv.Atoi(xStartString)
+	if err != nil {
+		return
+	}
+	xend, err = strconv.Atoi(xEndString)
+	if err != nil {
+		return
+	}
+	ystart, err = strconv.Atoi(yStartString)
+	if err != nil {
+		return
+	}
+	yend, err = strconv.Atoi(yEndString)
+	return
 }
