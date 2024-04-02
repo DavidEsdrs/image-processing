@@ -129,6 +129,7 @@ func setFlags(config *configs.Config, verbose *bool, help *bool) {
 	flag.Float64Var(&config.Sigma, "s", 1.0, "Sigma value for blur")
 	flag.IntVar(&config.Brightness, "l", 1.0, "Brightness value")
 	flag.Float64Var(&config.Saturation, "sat", 0, "Saturation value")
+	flag.Float64Var(&config.Rotation, "r", 0, "Rotation value")
 
 	// Resize
 	flag.BoolVar(&config.NearestNeighbor, "nn", false, "Apply nearest neighbor resize algorithm")

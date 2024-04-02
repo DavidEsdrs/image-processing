@@ -34,6 +34,7 @@ type Config struct {
 	Sigma      float64
 	Brightness int
 	Saturation float64
+	Rotation   float64
 
 	// Resize
 	NearestNeighbor bool
@@ -205,6 +206,11 @@ func (config *Config) ParseConfig(logger logger.Logger, inputImg image.Image) (*
 	if config.Saturation != 0 {
 		logger.LogProcess("Adjusting saturation")
 		f := filters.NewSaturationFilter(config.Saturation)
+		invoker.AddProcess(f)
+	}
+	if config.Rotation != 0 {
+		logger.LogProcess(fmt.Sprintf("Rotating %v degrees", config.Rotation))
+		f := filters.NewRotateFilter(config.Rotation)
 		invoker.AddProcess(f)
 	}
 	if !invoker.ShouldInvoke() && config.InputFormat == config.OutputFormat {
