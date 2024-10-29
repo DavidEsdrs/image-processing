@@ -5,24 +5,24 @@ import (
 	"image/color"
 	_ "image/jpeg"
 	_ "image/png"
+
+	"github.com/DavidEsdrs/image-processing/quad"
 )
 
 type PaletteStrategy struct {
 	palette color.Palette
 }
 
-func (pstr *PaletteStrategy) Convert(pixels [][]color.Color) image.Image {
-	rows := len(pixels)
-	cols := len(pixels[0])
-	rect := image.Rect(0, 0, cols, rows)
+func (pstr *PaletteStrategy) Convert(pixels *quad.Quad) image.Image {
+	rect := image.Rect(0, 0, pixels.Cols, pixels.Rows)
 	nImg := image.NewPaletted(rect, pstr.palette)
 
 	indexMap := make(map[color.Color]uint8)
 
-	for y := 0; y < rows; y++ {
-		for x := 0; x < cols; x++ {
+	for y := 0; y < pixels.Rows; y++ {
+		for x := 0; x < pixels.Cols; x++ {
 			i := nImg.PixOffset(x, y)
-			pixel := pixels[y][x]
+			pixel := pixels.GetPixel(x, y)
 
 			index, ok := indexMap[pixel]
 

@@ -1,6 +1,8 @@
 package filters
 
-import "image/color"
+import (
+	"image/color"
+)
 
 type TransposeFilter struct{}
 

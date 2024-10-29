@@ -5,23 +5,18 @@ import (
 	"image/color"
 	_ "image/jpeg"
 	_ "image/png"
+
+	"github.com/DavidEsdrs/image-processing/quad"
 )
 
 type Nrgba64Strategy struct{}
 
-func (pstr *Nrgba64Strategy) Convert(pixels [][]color.Color) image.Image {
-	rect := image.Rect(0, 0, len(pixels[0]), len(pixels))
+func (pstr *Nrgba64Strategy) Convert(pixels *quad.Quad) image.Image {
+	rect := image.Rect(0, 0, pixels.Cols, pixels.Rows)
 	nImg := image.NewNRGBA64(rect)
-	for y := 0; y < len(pixels); y++ {
-		for x := 0; x < len(pixels[0]); x++ {
-			q := pixels[y]
-			if q == nil {
-				continue
-			}
-			p := pixels[y][x]
-			if p == nil {
-				continue
-			}
+	for y := 0; y < pixels.Rows; y++ {
+		for x := 0; x < pixels.Cols; x++ {
+			p := pixels.GetPixel(x, y)
 			original, ok := color.NRGBA64Model.Convert(p).(color.NRGBA64)
 			if ok {
 				nImg.Set(x, y, original)

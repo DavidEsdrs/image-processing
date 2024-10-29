@@ -5,6 +5,8 @@ import (
 	"image/color"
 	"math"
 	"os"
+
+	"github.com/DavidEsdrs/image-processing/quad"
 )
 
 type Number interface {
@@ -124,6 +126,20 @@ func ConvertIntoTensor(img image.Image) [][]color.Color {
 		pixels[y] = make([]color.Color, size.X)
 		for x := 0; x < size.X; x++ {
 			pixels[y][x] = img.At(x, y)
+		}
+	}
+
+	return pixels
+}
+
+func ConvertIntoQuad(img image.Image) *quad.Quad {
+	size := img.Bounds().Size()
+	pixels := quad.NewQuad(size.X, size.Y)
+
+	for y := 0; y < size.Y; y++ {
+		for x := 0; x < size.X; x++ {
+			r, g, b, a := img.At(x, y).RGBA()
+			pixels.SetPixel(x, y, color.RGBA{uint8(r << 8), uint8(g << 8), uint8(b << 8), uint8(a << 8)})
 		}
 	}
 

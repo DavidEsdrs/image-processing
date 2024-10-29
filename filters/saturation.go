@@ -4,6 +4,7 @@ import (
 	"image/color"
 
 	"github.com/DavidEsdrs/image-processing/hsl"
+	"github.com/DavidEsdrs/image-processing/quad"
 	"github.com/DavidEsdrs/image-processing/utils"
 )
 
@@ -31,5 +32,21 @@ func (bf SaturationFilter) Execute(tensor *[][]color.Color) error {
 		}
 	}
 
+	return nil
+}
+
+func (bf SaturationFilter) ExecutePixel(img *quad.Quad) error {
+	img.Apply(func(pixel color.RGBA) color.RGBA {
+		hslPixel := hsl.ColorToHsl(pixel)
+		hslPixel.S += bf.saturation
+		hslPixel.S = utils.Clamp(hslPixel.S, 0.0, 1.0)
+		r, g, b, a := hslPixel.RGBA()
+		return color.RGBA{
+			R: uint8(r << 8),
+			G: uint8(g << 8),
+			B: uint8(b << 8),
+			A: uint8(a << 8),
+		}
+	})
 	return nil
 }
