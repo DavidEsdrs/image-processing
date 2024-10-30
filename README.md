@@ -23,6 +23,8 @@ This project is intended to offer a set of basic features on image processing. I
 - [ ] Sharpen
 - [X] Saturation
 - [X] Brightness
+- [X] Invert
+- [X] Color temperature
 
 ## Dev requirements 🔎
 
