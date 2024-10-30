@@ -1,34 +1,29 @@
 package filters
 
-import "image/color"
+import (
+	"github.com/DavidEsdrs/image-processing/quad"
+)
 
-type TurnLeftFilter struct{}
+type TurnRightFilter struct{}
 
-func NewTurnLeftFilter() TurnLeftFilter {
-	return TurnLeftFilter{}
+func NewTurnRightFilter() TurnRightFilter {
+	return TurnRightFilter{}
 }
 
-func (gsf TurnLeftFilter) Execute(tensor *[][]color.Color) error {
-	img := *tensor
+func (gsf TurnRightFilter) Execute(q *quad.Quad) error {
+	originalRows := q.Rows
+	originalCols := q.Cols
 
-	originalRows := len(img)
-	originalCols := len(img[0])
+	rows := q.Rows
 
-	rows := len(img[0])
-	cols := len(img)
-
-	res := make([][]color.Color, rows)
-
-	for i := range res {
-		res[i] = make([]color.Color, cols)
-	}
+	res := q.Clone()
 
 	for i := 0; i < originalRows; i++ {
 		for j := 0; j < originalCols; j++ {
-			res[j][originalRows-i-1] = img[i][j]
+			res.SetPixel(i, rows-j-1, q.GetPixel(j, i))
 		}
 	}
 
-	*tensor = res
+	*q = *res
 	return nil
 }

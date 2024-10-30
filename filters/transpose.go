@@ -1,6 +1,8 @@
 package filters
 
-import "image/color"
+import (
+	"github.com/DavidEsdrs/image-processing/quad"
+)
 
 type TransposeFilter struct{}
 
@@ -8,21 +10,15 @@ func NewTransposeFilter() TransposeFilter {
 	return TransposeFilter{}
 }
 
-func (gsf TransposeFilter) Execute(tensor *[][]color.Color) error {
-	img := *tensor
+func (gsf TransposeFilter) Execute(q *quad.Quad) error {
+	res := q.Clone()
 
-	res := make([][]color.Color, len(img[0]))
-
-	for i := range res {
-		res[i] = make([]color.Color, len(img))
-	}
-
-	for i := 0; i < len(img); i++ {
-		for j := 0; j < len(img[0]); j++ {
-			res[j][i] = img[i][j]
+	for i := 0; i < q.Rows; i++ {
+		for j := 0; j < q.Cols; j++ {
+			res.SetPixel(i, j, q.GetPixel(j, i))
 		}
 	}
 
-	*tensor = res
+	*q = *res
 	return nil
 }

@@ -20,10 +20,11 @@ import (
 	"github.com/DavidEsdrs/image-processing/configs"
 	"github.com/DavidEsdrs/image-processing/logger"
 	"github.com/DavidEsdrs/image-processing/palette"
+	"github.com/DavidEsdrs/image-processing/quad"
 )
 
 type ConversionStrategy interface {
-	Convert(pixels [][]color.Color) image.Image
+	Convert(pixels *quad.Quad) image.Image
 }
 
 type ConversionContext struct {

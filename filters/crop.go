@@ -3,7 +3,8 @@ package filters
 import (
 	"fmt"
 	"image"
-	"image/color"
+
+	"github.com/DavidEsdrs/image-processing/quad"
 )
 
 type CropFilter struct {
@@ -22,21 +23,23 @@ func NewCropFilter(inputImg image.Image, xstart, ystart, xend, yend int) (CropFi
 	return CropFilter{xstart, ystart, xend, yend}, nil
 }
 
-func (cf CropFilter) Execute(tensor *[][]color.Color) error {
-	img := *tensor
+func (cf CropFilter) Execute(img *quad.Quad) error {
+	croppedWidth := cf.xend - cf.xstart
+	croppedHeight := cf.yend - cf.ystart
 
-	res := make([][]color.Color, cf.yend-cf.ystart)
-
-	for i := range res {
-		res[i] = make([]color.Color, cf.xend-cf.xstart)
+	if cf.xstart < 0 || cf.ystart < 0 || cf.xend > img.Cols || cf.yend > img.Rows {
+		return fmt.Errorf("crop points are out of image bounds")
 	}
 
-	for i := cf.ystart; i < cf.yend; i++ {
-		for j := cf.xstart; j < cf.xend; j++ {
-			res[i-cf.ystart][j-cf.xstart] = img[i][j]
+	croppedQuad := quad.NewQuad(croppedWidth, croppedHeight)
+
+	for y := cf.ystart; y < cf.yend; y++ {
+		for x := cf.xstart; x < cf.xend; x++ {
+			pixel := img.GetPixel(x, y)
+			croppedQuad.SetPixel(x-cf.xstart, y-cf.ystart, pixel)
 		}
 	}
 
-	*tensor = res
+	*img = *croppedQuad
 	return nil
 }

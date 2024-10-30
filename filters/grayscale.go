@@ -4,6 +4,7 @@ import (
 	"image/color"
 
 	"github.com/DavidEsdrs/image-processing/processor"
+	"github.com/DavidEsdrs/image-processing/quad"
 )
 
 type Grayscale16Filter struct {
@@ -14,29 +15,32 @@ func NewGrayscale16Filter(ctx *processor.Invoker) Grayscale16Filter {
 	return Grayscale16Filter{ctx}
 }
 
-func (gs Grayscale16Filter) Execute(tensor *[][]color.Color) error {
-	img := *tensor
-
+func (gs Grayscale16Filter) Execute(q *quad.Quad) error {
 	var rows int
 	var cols int
 
-	rows = int(len(img))
-	cols = int(len(img[0]))
+	rows = q.Rows
+	cols = q.Cols
 
-	res := make([][]color.Color, rows)
+	res := q.Clone()
 
 	for i := 0; i < rows; i++ {
-		res[i] = make([]color.Color, cols)
-
 		for j := 0; j < cols; j++ {
-			originalColor := img[i][j]
+			originalColor := q.GetPixel(j, i)
 
 			newColor := color.Gray16Model.Convert(originalColor)
 
-			res[i][j] = newColor
+			r, g, b, a := newColor.RGBA()
+
+			res.SetPixel(j, i, color.RGBA{
+				R: uint8(r >> 8),
+				G: uint8(g >> 8),
+				B: uint8(b >> 8),
+				A: uint8(a >> 8),
+			})
 		}
 	}
 
-	*tensor = res
+	*q = *res
 	return nil
 }
