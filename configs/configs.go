@@ -20,22 +20,23 @@ var ErrNoEffectAppliedNorContainer = fmt.Errorf("no effect applied nor container
 
 type Config struct {
 	// Filters
-	Input      string
-	Output     string
-	FlipY      bool
-	FlipX      bool
-	Transpose  bool
-	Grayscale  bool
-	TurnLeft   bool
-	TurnRight  bool
-	Crop       string
-	Overlay    string
-	BlurSize   int
-	Sigma      float64
-	Brightness int
-	Saturation float64
-	Rotation   float64
-	Invert     bool
+	Input       string
+	Output      string
+	FlipY       bool
+	FlipX       bool
+	Transpose   bool
+	Grayscale   bool
+	TurnLeft    bool
+	TurnRight   bool
+	Crop        string
+	Overlay     string
+	BlurSize    int
+	Sigma       float64
+	Brightness  int
+	Saturation  float64
+	Rotation    float64
+	Invert      bool
+	Temperature int
 
 	// Resize
 	NearestNeighbor bool
@@ -217,6 +218,11 @@ func (config *Config) ParseConfig(logger logger.Logger, inputImg image.Image) (*
 	if config.Invert {
 		logger.LogProcess("Inverting colors")
 		f := filters.NewInvertFilter()
+		invoker.AddProcess(f)
+	}
+	if config.Temperature != 0 {
+		logger.LogProcess("Changing color temperature")
+		f := filters.NewTemperatureFilter(float64(config.Temperature))
 		invoker.AddProcess(f)
 	}
 	if !invoker.ShouldInvoke() && config.InputFormat == config.OutputFormat {
