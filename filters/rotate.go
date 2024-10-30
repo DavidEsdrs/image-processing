@@ -1,8 +1,9 @@
 package filters
 
 import (
-	"image/color"
 	"math"
+
+	"github.com/DavidEsdrs/image-processing/quad"
 )
 
 type RotateFilter struct {
@@ -13,44 +14,33 @@ func NewRotateFilter(degrees float64) RotateFilter {
 	return RotateFilter{degrees}
 }
 
-func (rf RotateFilter) Execute(tensor *[][]color.Color) error {
-	centerX, centerY := getCenterCoordinates(tensor)
-	height := len(*tensor)
-	width := len((*tensor)[0])
+func (rf RotateFilter) Execute(img *quad.Quad) error {
+	centerX, centerY := getCenterCoordinates(img)
+	height := img.Rows
+	width := img.Cols
 
-	var tensorCopy *[][]color.Color
-
-	imgD := withDimensions(width, height)
-	tensorCopy = &imgD
+	imgCopy := img.Clone()
 
 	for y1 := 0; y1 < height; y1++ {
 		for x1 := 0; x1 < width; x1++ {
 			x2, y2 := rotatePixel(rf.degrees, centerX, centerY, x1, y1)
 
 			if x2 < width && y2 < height && x2 >= 0 && y2 >= 0 {
-				(*tensorCopy)[y1][x1] = (*tensor)[y2][x2]
+				if err := imgCopy.SetPixel(x1, y1, img.GetPixel(x2, y2)); err != nil {
+					return err
+				}
 			}
 		}
 	}
 
-	*tensor = *tensorCopy
+	*img = *imgCopy
 
 	return nil
 }
 
-func withDimensions(width, height int) [][]color.Color {
-	copy := make([][]color.Color, height)
-
-	for y := 0; y < height; y++ {
-		copy[y] = make([]color.Color, width)
-	}
-
-	return copy
-}
-
-func getCenterCoordinates(tensor *[][]color.Color) (x, y int) {
-	height := len(*tensor)
-	width := len((*tensor)[0])
+func getCenterCoordinates(img *quad.Quad) (x, y int) {
+	height := img.Rows
+	width := img.Cols
 	y = height / 2
 	x = width / 2
 	return
