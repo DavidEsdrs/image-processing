@@ -3,6 +3,8 @@ package filters
 import (
 	"image/color"
 	"math"
+
+	"github.com/DavidEsdrs/image-processing/quad"
 )
 
 type BrightnessFilter struct {
@@ -14,33 +16,28 @@ func NewBrightnessFilter(luminance int) BrightnessFilter {
 }
 
 // reference for this algorithm: https://ie.nitk.ac.in/blog/2020/01/19/algorithms-for-adjusting-brightness-and-contrast-of-an-image/
-func (bf BrightnessFilter) Execute(tensor *[][]color.Color) error {
-	height := len(*tensor)
-	width := len((*tensor)[0])
+func (bf BrightnessFilter) Execute(q *quad.Quad) error {
+	q.Apply(func(pixel color.RGBA) color.RGBA {
+		r, g, b, a := pixel.RGBA()
 
-	for y := 0; y < height; y++ {
-		for x := 0; x < width; x++ {
-			pixel := (*tensor)[y][x]
-			r, g, b, a := pixel.RGBA()
+		rAsUint8 := r >> 8
+		gAsUint8 := g >> 8
+		bAsUint8 := b >> 8
+		A := uint8(a >> 8)
 
-			rAsUint8 := r >> 8
-			gAsUint8 := g >> 8
-			bAsUint8 := b >> 8
-			A := uint8(a >> 8)
+		newR := truncate(int(rAsUint8), bf.luminance)
+		newG := truncate(int(gAsUint8), bf.luminance)
+		newB := truncate(int(bAsUint8), bf.luminance)
 
-			newR := truncate(int(rAsUint8), bf.luminance)
-			newG := truncate(int(gAsUint8), bf.luminance)
-			newB := truncate(int(bAsUint8), bf.luminance)
-
-			newPixel := color.RGBA{
-				R: uint8(newR),
-				G: uint8(newG),
-				B: uint8(newB),
-				A: A,
-			}
-			(*tensor)[y][x] = newPixel
+		newPixel := color.RGBA{
+			R: uint8(newR),
+			G: uint8(newG),
+			B: uint8(newB),
+			A: A,
 		}
-	}
+
+		return newPixel
+	})
 
 	return nil
 }
