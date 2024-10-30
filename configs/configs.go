@@ -35,6 +35,7 @@ type Config struct {
 	Brightness int
 	Saturation float64
 	Rotation   float64
+	Invert     bool
 
 	// Resize
 	NearestNeighbor bool
@@ -211,6 +212,11 @@ func (config *Config) ParseConfig(logger logger.Logger, inputImg image.Image) (*
 	if config.Rotation != 0 {
 		logger.LogProcess(fmt.Sprintf("Rotating %v degrees", config.Rotation))
 		f := filters.NewRotateFilter(config.Rotation)
+		invoker.AddProcess(f)
+	}
+	if config.Invert {
+		logger.LogProcess("Inverting colors")
+		f := filters.NewInvertFilter()
 		invoker.AddProcess(f)
 	}
 	if !invoker.ShouldInvoke() && config.InputFormat == config.OutputFormat {
