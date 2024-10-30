@@ -2,10 +2,12 @@ package processor
 
 import (
 	"image/color"
+
+	"github.com/DavidEsdrs/image-processing/quad"
 )
 
 type Command interface {
-	Execute(*[][]color.Color) error
+	Execute(*quad.Quad) error
 }
 
 type Invoker struct {
@@ -16,9 +18,9 @@ type Invoker struct {
 
 // Invoke invokes all the commands (processes, filters or transformations) and
 // applies it to the given tensor, which represents the input image.
-func (i *Invoker) Invoke(tensor *[][]color.Color) error {
+func (i *Invoker) Invoke(q *quad.Quad) error {
 	for _, p := range i.processes {
-		err := p.Execute(tensor)
+		err := p.Execute(q)
 		if err != nil {
 			return err
 		}

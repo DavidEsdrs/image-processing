@@ -5,6 +5,8 @@ import (
 	"image/color"
 	"math"
 	"os"
+
+	"github.com/DavidEsdrs/image-processing/quad"
 )
 
 type Number interface {
@@ -130,31 +132,58 @@ func ConvertIntoTensor(img image.Image) [][]color.Color {
 	return pixels
 }
 
+func ConvertIntoQuad(img image.Image) *quad.Quad {
+	size := img.Bounds().Size()
+	pixels := quad.NewQuad(size.X, size.Y)
+
+	for y := 0; y < size.Y; y++ {
+		for x := 0; x < size.X; x++ {
+			r, g, b, a := img.At(x, y).RGBA()
+			r >>= 8
+			g >>= 8
+			b >>= 8
+			a >>= 8
+			pixels.SetPixel(x, y, color.RGBA{uint8(r), uint8(g), uint8(b), uint8(a)})
+		}
+	}
+
+	return pixels
+}
+
+// Kernel represents a gaussian kernel in a linear structure
+type Kernel struct {
+	Size int
+	Data []float64
+}
+
+func (k *Kernel) GetValue(x, y int) float64 {
+	index := y*k.Size + x
+	return k.Data[index]
+}
+
 // Creates a gaussian kernel of the given size, using the given sigma
-func GaussianKernel(size int, sigma float64) [][]float64 {
+func GaussianKernel(size int, sigma float64) Kernel {
 	if size%2 == 0 {
 		size++
 	}
 
-	kernel := make([][]float64, size)
 	center := size / 2
+	kernelData := make([]float64, size*size) // Criando um slice linear para armazenar os dados
 	sum := 0.0
 
 	for i := 0; i < size; i++ {
-		kernel[i] = make([]float64, size)
 		for j := 0; j < size; j++ {
 			x := float64(j - center)
 			y := float64(i - center)
-			kernel[i][j] = math.Exp(-(x*x+y*y)/(2*sigma*sigma)) / (2 * math.Pi * sigma * sigma)
-			sum += kernel[i][j]
+			index := i*size + j // Cálculo do índice no slice linear
+			kernelData[index] = math.Exp(-(x*x+y*y)/(2*sigma*sigma)) / (2 * math.Pi * sigma * sigma)
+			sum += kernelData[index]
 		}
 	}
 
-	for i := 0; i < size; i++ {
-		for j := 0; j < size; j++ {
-			kernel[i][j] /= sum
-		}
+	for i := 0; i < size*size; i++ {
+		kernelData[i] /= sum // Normalização do kernel
 	}
 
-	return kernel
+	return Kernel{Size: size, Data: kernelData}
 }

@@ -1,6 +1,6 @@
 package filters
 
-import "image/color"
+import "github.com/DavidEsdrs/image-processing/quad"
 
 type FlipYFilter struct{}
 
@@ -8,14 +8,17 @@ func NewFlipYFilter() FlipYFilter {
 	return FlipYFilter{}
 }
 
-func (fyf FlipYFilter) Execute(tensor *[][]color.Color) error {
-	img := *tensor
-	rows := len(img)
-	cols := len(img[0])
+func (fyf FlipYFilter) Execute(q *quad.Quad) error {
+	rows, cols := q.Rows, q.Cols
+	for y := 0; y < rows/2; y++ {
+		for x := 0; x < cols; x++ {
+			// Pega o pixel na posição (x, y) e o pixel na posição espelhada (x, rows-y-1)
+			topPixel := q.GetPixel(x, y)
+			bottomPixel := q.GetPixel(x, rows-y-1)
 
-	for i := 0; i < rows/2; i++ {
-		for j := 0; j < cols; j++ {
-			img[rows-i-1][j], img[i][j] = img[i][j], img[rows-i-1][j]
+			// Troca os pixels
+			q.SetPixel(x, y, bottomPixel)
+			q.SetPixel(x, rows-y-1, topPixel)
 		}
 	}
 	return nil

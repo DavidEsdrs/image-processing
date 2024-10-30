@@ -72,10 +72,10 @@ func main() {
 
 func processImage(img image.Image, outputPath string, proc *processor.Invoker, logger *logger.Logger) error {
 	logger.LogProcess("Converting image into tensor")
-	tensor := utils.ConvertIntoTensor(img)
+	q := utils.ConvertIntoQuad(img)
 
 	logger.LogProcess("Start invoking filters")
-	err := proc.Invoke(&tensor)
+	err := proc.Invoke(q)
 
 	if err != nil {
 		return err
@@ -90,7 +90,7 @@ func processImage(img image.Image, outputPath string, proc *processor.Invoker, l
 	}
 
 	logger.LogProcess("Converting tensor back into image")
-	cImg := conversor.Convert(tensor)
+	cImg := conversor.Convert(q)
 
 	pc := parsing.NewParsingContext(logger)
 

@@ -5,6 +5,7 @@ import (
 	"sync"
 
 	"github.com/DavidEsdrs/image-processing/logger"
+	"github.com/DavidEsdrs/image-processing/quad"
 	"github.com/DavidEsdrs/image-processing/utils"
 )
 
@@ -12,7 +13,7 @@ type BlurFilter struct {
 	l          logger.Logger
 	sigma      float64
 	kernelSize int // this will define how blurry the image is
-	kernel     [][]float64
+	kernel     utils.Kernel
 }
 
 func NewBlurFilter(l logger.Logger, sigma float64, kernelSize int) (BlurFilter, error) {
@@ -24,24 +25,25 @@ func NewBlurFilter(l logger.Logger, sigma float64, kernelSize int) (BlurFilter, 
 	return bf, nil
 }
 
-func (bf BlurFilter) Execute(tensor *[][]color.Color) error {
-	height := len(*tensor)
-	width := len((*tensor)[0])
+func (bf BlurFilter) Execute(img *quad.Quad) error {
+	height := img.Rows
+	width := img.Cols
 
 	paddingSize := bf.kernelSize / 2
-	copy := padImage(tensor, paddingSize)
+	copy := padImage(img, paddingSize)
 
 	var wg sync.WaitGroup
 
 	process := func(x, y int) {
 		defer wg.Done()
-		r, g, b, a := bf.getValuesForPixel(tensor, copy, x, y)
-		(*tensor)[y][x] = color.RGBA{
+		r, g, b, a := bf.getValuesForPixel(img, copy, x, y)
+
+		img.SetPixel(x, y, color.RGBA{
 			R: uint8(r >> 8),
 			G: uint8(g >> 8),
 			B: uint8(b >> 8),
 			A: uint8(a >> 8),
-		}
+		})
 	}
 
 	for y := paddingSize; y < height+paddingSize; y++ {
@@ -56,31 +58,27 @@ func (bf BlurFilter) Execute(tensor *[][]color.Color) error {
 	return nil
 }
 
-func padImage(img *[][]color.Color, paddingSize int) *[][]color.Color {
-	width := len((*img)[0])
-	targetWidth := len((*img)[0]) + paddingSize*2
+func padImage(img *quad.Quad, paddingSize int) *quad.Quad {
+	width := img.Cols
+	targetWidth := img.Cols + paddingSize*2
 
-	height := len(*img)
-	targetHeight := len(*img) + paddingSize*2
+	height := img.Rows
+	targetHeight := img.Rows + paddingSize*2
 
-	output := make([][]color.Color, height)
-
-	for y := 0; y < height; y++ {
-		output[y] = make([]color.Color, targetWidth)
-	}
+	output := quad.NewQuad(targetWidth, targetHeight)
 
 	padHorizontal := func() {
 		for y := 0; y < height; y++ {
-			firstPixel := (*img)[y][0]
-			lastPixel := (*img)[y][width-1]
+			firstPixel := img.GetPixel(0, y)
+			lastPixel := img.GetPixel(width-1, y)
 
 			for x := 0; x < targetWidth; x++ {
 				if x > paddingSize && x < targetWidth-paddingSize {
-					output[y][x] = (*img)[y][x-paddingSize]
+					output.SetPixel(x, y, img.GetPixel(x-paddingSize, y))
 				} else if x < paddingSize {
-					output[y][x] = firstPixel
+					output.SetPixel(x, y, firstPixel)
 				} else {
-					output[y][x] = lastPixel
+					output.SetPixel(x, y, lastPixel)
 				}
 			}
 		}
@@ -88,36 +86,36 @@ func padImage(img *[][]color.Color, paddingSize int) *[][]color.Color {
 
 	padHorizontal()
 
-	padVertical := func() *[][]color.Color {
-		newOutput := make([][]color.Color, targetHeight)
+	padVertical := func() *quad.Quad {
+		newOutput := quad.NewQuad(targetWidth, targetHeight)
 
-		firstLine := output[0]
-		lastLine := output[height-1]
+		firstLine := output.GetRow(0)
+		lastLine := output.GetRow(height - 1)
 
 		for y := 0; y < targetHeight; y++ {
 			if y > paddingSize && y < targetHeight-paddingSize {
-				newOutput[y] = output[y-paddingSize]
+				newOutput.SetRow(y, output.GetRow(y-paddingSize))
 			} else if y < paddingSize {
-				newOutput[y] = firstLine
+				newOutput.SetRow(y, firstLine)
 			} else {
-				newOutput[y] = lastLine
+				newOutput.SetRow(y, lastLine)
 			}
 		}
 
-		return &newOutput
+		return newOutput
 	}
 
 	return padVertical()
 }
 
 func (bf BlurFilter) getValuesForPixel(
-	tensor *[][]color.Color,
-	copy *[][]color.Color,
+	tensor *quad.Quad,
+	copy *quad.Quad,
 	startX,
 	startY int,
 ) (r, g, b, a uint32) {
-	height := len(*tensor)
-	width := len((*tensor)[0])
+	height := tensor.Rows
+	width := tensor.Cols
 
 	var (
 		rnew uint32
@@ -134,8 +132,8 @@ func (bf BlurFilter) getValuesForPixel(
 
 	for y := sy; y <= endY && y < height; y++ {
 		for x := sx; x <= endX && x < width; x++ {
-			w := bf.kernel[y-sy][x-sx]
-			r, g, b, a := (*copy)[y][x].RGBA()
+			w := bf.kernel.GetValue(x-sx, y-sy)
+			r, g, b, a := copy.GetPixel(x, y).RGBA()
 
 			convertedR := float64(r) * w
 			convertedG := float64(g) * w
