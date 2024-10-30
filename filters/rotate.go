@@ -19,21 +19,21 @@ func (rf RotateFilter) Execute(img *quad.Quad) error {
 	height := img.Rows
 	width := img.Cols
 
-	imgCopy := img.Clone()
+	dest := quad.NewQuad(img.Cols, img.Rows)
 
 	for y1 := 0; y1 < height; y1++ {
 		for x1 := 0; x1 < width; x1++ {
 			x2, y2 := rotatePixel(rf.degrees, centerX, centerY, x1, y1)
 
 			if x2 < width && y2 < height && x2 >= 0 && y2 >= 0 {
-				if err := imgCopy.SetPixel(x1, y1, img.GetPixel(x2, y2)); err != nil {
+				if err := dest.SetPixel(x1, y1, img.GetPixel(x2, y2)); err != nil {
 					return err
 				}
 			}
 		}
 	}
 
-	*img = *imgCopy
+	*img = *dest
 
 	return nil
 }
