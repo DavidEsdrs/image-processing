@@ -130,7 +130,7 @@ func (q *Quad) SetRow(y int, row []color.RGBA) {
 
 func (q *Quad) Iterate(f func(color.RGBA)) {
 	for idx := 0; idx < len(q.pix); idx += 4 {
-		channels := q.pix[idx : idx+3 : idx+3]
+		channels := q.pix[idx : idx+4 : idx+4]
 		pixel := color.RGBA{channels[0], channels[1], channels[2], channels[3]}
 		f(pixel)
 	}
