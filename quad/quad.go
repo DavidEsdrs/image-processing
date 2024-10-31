@@ -19,6 +19,17 @@ func NewQuad(Cols, Rows int) *Quad {
 	}
 }
 
+func NewEmptyQuad(Cols, Rows int) *Quad {
+	return &Quad{
+		Rows: Rows,
+		Cols: Cols,
+	}
+}
+
+func (q *Quad) SetSlice(pix []uint8) {
+	q.pix = pix
+}
+
 // return the underlying slice
 func (q *Quad) GetUnderlyingSlice() []uint8 {
 	return q.pix
@@ -133,6 +144,13 @@ func (q *Quad) Iterate(f func(color.RGBA)) {
 		channels := q.pix[idx : idx+4 : idx+4]
 		pixel := color.RGBA{channels[0], channels[1], channels[2], channels[3]}
 		f(pixel)
+	}
+}
+
+// iterate each channel of the image in that order (r, g, b, a)
+func (q *Quad) IterateChannel(f func(c uint8)) {
+	for idx := 0; idx < len(q.pix); idx++ {
+		f(q.pix[idx])
 	}
 }
 

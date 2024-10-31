@@ -150,6 +150,39 @@ func ConvertIntoQuad(img image.Image) *quad.Quad {
 	return pixels
 }
 
+// instead of recreating the whole []uint8, we try to get it from the image first
+func GetQuad(img image.Image) *quad.Quad {
+	size := img.Bounds().Size()
+	pixels := quad.NewEmptyQuad(size.X, size.Y)
+
+	switch img := img.(type) {
+	case *image.NRGBA:
+		pixels.SetSlice(img.Pix)
+	case *image.RGBA:
+		pixels.SetSlice(img.Pix)
+	case *image.Gray:
+		pixels.SetSlice(img.Pix)
+	case *image.Alpha:
+		pixels.SetSlice(img.Pix)
+	case *image.Alpha16:
+		pixels.SetSlice(img.Pix)
+	case *image.NRGBA64:
+		pixels.SetSlice(img.Pix)
+	case *image.RGBA64:
+		pixels.SetSlice(img.Pix)
+	case *image.Gray16:
+		pixels.SetSlice(img.Pix)
+	case *image.CMYK:
+		pixels.SetSlice(img.Pix)
+	case *image.Paletted:
+		pixels.SetSlice(img.Pix)
+	default:
+		return ConvertIntoQuad(img)
+	}
+
+	return pixels
+}
+
 // Kernel represents a gaussian kernel in a linear structure
 type Kernel struct {
 	Size int
@@ -168,21 +201,21 @@ func GaussianKernel(size int, sigma float64) Kernel {
 	}
 
 	center := size / 2
-	kernelData := make([]float64, size*size) // Criando um slice linear para armazenar os dados
+	kernelData := make([]float64, size*size)
 	sum := 0.0
 
 	for i := 0; i < size; i++ {
 		for j := 0; j < size; j++ {
 			x := float64(j - center)
 			y := float64(i - center)
-			index := i*size + j // Cálculo do índice no slice linear
+			index := i*size + j
 			kernelData[index] = math.Exp(-(x*x+y*y)/(2*sigma*sigma)) / (2 * math.Pi * sigma * sigma)
 			sum += kernelData[index]
 		}
 	}
 
 	for i := 0; i < size*size; i++ {
-		kernelData[i] /= sum // Normalização do kernel
+		kernelData[i] /= sum
 	}
 
 	return Kernel{Size: size, Data: kernelData}
