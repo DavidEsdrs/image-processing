@@ -37,6 +37,7 @@ type Config struct {
 	Rotation    float64
 	Invert      bool
 	Temperature int
+	Contrast    float64
 
 	// Resize
 	NearestNeighbor bool
@@ -223,6 +224,11 @@ func (config *Config) ParseConfig(logger logger.Logger, inputImg image.Image) (*
 	if config.Temperature != 0 {
 		logger.LogProcess("Changing color temperature")
 		f := filters.NewTemperatureFilter(float64(config.Temperature))
+		invoker.AddProcess(f)
+	}
+	if config.Contrast != 1 {
+		logger.LogProcess("Changing contrast")
+		f := filters.NewContrastFilter(config.Contrast, &logger)
 		invoker.AddProcess(f)
 	}
 	if !invoker.ShouldInvoke() && config.InputFormat == config.OutputFormat {

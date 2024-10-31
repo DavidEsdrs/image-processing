@@ -132,6 +132,7 @@ func setFlags(config *configs.Config, verbose *bool, help *bool) {
 	flag.Float64Var(&config.Rotation, "r", 0, "Rotation value")
 	flag.BoolVar(&config.Invert, "inv", false, "Invert")
 	flag.IntVar(&config.Temperature, "temp", 0, "Color temperature in Kelvin (ranging from 1000 to 4000)")
+	flag.Float64Var(&config.Contrast, "cont", 0, "Contrast value (ranging from -1 for less contrast up to 1 for more contrast)")
 
 	// Resize
 	flag.BoolVar(&config.NearestNeighbor, "nn", false, "Apply nearest neighbor resize algorithm")
