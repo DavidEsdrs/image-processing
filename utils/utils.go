@@ -160,23 +160,8 @@ func GetQuad(img image.Image) *quad.Quad {
 		pixels.SetSlice(img.Pix)
 	case *image.RGBA:
 		pixels.SetSlice(img.Pix)
-	case *image.Gray:
-		pixels.SetSlice(img.Pix)
-	case *image.Alpha:
-		pixels.SetSlice(img.Pix)
-	case *image.Alpha16:
-		pixels.SetSlice(img.Pix)
-	case *image.NRGBA64:
-		pixels.SetSlice(img.Pix)
-	case *image.RGBA64:
-		pixels.SetSlice(img.Pix)
-	case *image.Gray16:
-		pixels.SetSlice(img.Pix)
-	case *image.CMYK:
-		pixels.SetSlice(img.Pix)
-	case *image.Paletted:
-		pixels.SetSlice(img.Pix)
-	default:
+	case *image.Gray, *image.Alpha, *image.Alpha16, *image.NRGBA64, *image.RGBA64,
+		*image.Gray16, *image.CMYK, *image.Paletted:
 		return ConvertIntoQuad(img)
 	}
 
