@@ -40,6 +40,9 @@ func (cc *ParsingContext) GetConfig() (ConversionStrategy, error) {
 	case "gif":
 		cc.logger.LogProcess("Converting/parsing as GIF")
 		return &GifParsingStrategy{logger: cc.logger}, nil
+	case "webp":
+		cc.logger.LogProcess("Converting/parsing as WEBP")
+		return &WebpParsingStrategy{logger: cc.logger}, nil
 	}
 
 	return nil, fmt.Errorf("unknown file type")
