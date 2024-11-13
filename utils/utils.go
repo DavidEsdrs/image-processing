@@ -161,7 +161,7 @@ func GetQuad(img image.Image) *quad.Quad {
 	case *image.RGBA:
 		pixels.SetSlice(img.Pix)
 	case *image.Gray, *image.Alpha, *image.Alpha16, *image.NRGBA64, *image.RGBA64,
-		*image.Gray16, *image.CMYK, *image.Paletted:
+		*image.Gray16, *image.CMYK, *image.Paletted, *image.YCbCr:
 		return ConvertIntoQuad(img)
 	}
 
