@@ -2,7 +2,7 @@
 
 This project is intended to offer a set of basic features on image processing. It is a tool for image processing. 
 
-> **Note**: At the moment, it  only supports JPEG, PNG and GIF
+> **Note**: At the moment, it supports JPEG, PNG, GIF and Webp
 
 ## Features 🌟
 
@@ -34,6 +34,8 @@ It was developed on golang 1.20.4, but it is likely to work on golang 1.16+ for 
 
 For the build version you just need to install the [executable](https://github.com/DavidEsdrs/image-processing/releases
 ).
+
+Make sure to have GCC or MinGW installed in your machine if you aim to support webp images.
 
 ❗ Are you encountering the "iproc: command not found" error or something similar? This happens because Windows isn't updating the PATH environment variables. You need add a PATH variable with the path that you downloaded the executable. Click [here](https://helpdeskgeek.com/windows-10/add-windows-path-environment-variable/) to learn how to update them manually.
 
